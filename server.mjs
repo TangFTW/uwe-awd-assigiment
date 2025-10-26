@@ -44,6 +44,12 @@ server.get('/', async (_req, res) => {
 // Shared search handler
 async function handleMobilepostSearch(req, res) {
   const { districtEN, dayOfWeekCode, mobileCode, openAt } = req.query;
+  // Log when searching by district (and include URL for clarity)
+  if (districtEN) {
+    console.log('Get records by district', districtEN);
+  } else {
+    console.log( 'Search mobilepost', req.query);
+  }
   const where = [];
   const params = [];
 
