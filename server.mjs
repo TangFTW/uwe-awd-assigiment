@@ -29,7 +29,6 @@ server.get('/', async (_req, res) => {
   console.log('Welcome to the HKPO Mobile Post API');
   try {
     const [rows] = await pool.query('SELECT * FROM mobilepost');
-    // Send Hello World and data together
     res.json({
       message: 'Hello World',
       count: rows.length,
@@ -44,7 +43,6 @@ server.get('/', async (_req, res) => {
 // Shared search handler
 async function handleMobilepostSearch(req, res) {
   const { districtEN, dayOfWeekCode, mobileCode, openAt } = req.query;
-  // Log when searching by district (and include URL for clarity)
   if (districtEN) {
     console.log('Get records by district', districtEN);
   } else {
@@ -72,8 +70,6 @@ async function handleMobilepostSearch(req, res) {
   }
   if (openAt) {
     const hhmm = normHHMM(openAt);
-    // If time is provided and can be normalized, apply the time filter.
-    // Otherwise, ignore invalid formats instead of returning 400.
     if (hhmm) {
       where.push('openHour <= ?');
       params.push(hhmm);
@@ -100,13 +96,10 @@ async function handleMobilepostSearch(req, res) {
   }
 }
 
-// IMPORTANT: Register search routes BEFORE parameterized /:id route
-// Alias 1: canonical search path
+
 server.get('/mobilepost/search', handleMobilepostSearch);
-// Alias 2: allow GET /mobilepost?districtEN=...&openAt=...
 server.get('/mobilepost', handleMobilepostSearch);
 
-// GET by ID (placed after search routes to avoid shadowing)
 server.get('/mobilepost/:id', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
@@ -123,9 +116,8 @@ server.get('/mobilepost/:id', async (req, res) => {
   }
 });
 
-// (Removed duplicate inline search implementation in favor of shared handler)
 
-// POST new record
+// new record
 server.post('/mobilepost', async (req, res) => {
   console.log('POST /mobilepost - creating record', req.body);
   const {
@@ -171,7 +163,6 @@ server.post('/mobilepost', async (req, res) => {
   }
 });
 
-// PUT (partial update)
 server.put('/mobilepost/:id', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
@@ -249,3 +240,4 @@ server.delete('/mobilepost/:id', async (req, res) => {
 server.listen(3001, () => {
   console.log('Server started.');
 });
+
