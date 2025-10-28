@@ -1,5 +1,5 @@
 
-REATE DATABASE IF NOT EXISTS `hkpo_mobile`
+CREATE DATABASE IF NOT EXISTS `hkpo_mobile`
   DEFAULT CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
 
@@ -55,3 +55,4 @@ ALTER TABLE `mobilepost`
   MODIFY `id` BIGINT NOT NULL AUTO_INCREMENT;
 
 COMMIT;
+
