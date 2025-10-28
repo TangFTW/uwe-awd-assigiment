@@ -26,9 +26,9 @@ function normHHMM(v) {
 
 
 server.get('/', async (_req, res) => {
-  console.log('Welcome to the HKPO Mobile Post API');
   try {
     const [rows] = await pool.query('SELECT * FROM mobilepost');
+    // Send Hello World and data together
     res.json({
       message: 'Hello World',
       count: rows.length,
@@ -43,11 +43,6 @@ server.get('/', async (_req, res) => {
 // Shared search handler
 async function handleMobilepostSearch(req, res) {
   const { districtEN, dayOfWeekCode, mobileCode, openAt } = req.query;
-  if (districtEN) {
-    console.log('Get records by district', districtEN);
-  } else {
-    console.log( 'Search mobilepost', req.query);
-  }
   const where = [];
   const params = [];
 
@@ -70,6 +65,8 @@ async function handleMobilepostSearch(req, res) {
   }
   if (openAt) {
     const hhmm = normHHMM(openAt);
+    // If time is provided and can be normalized, apply the time filter.
+    // Otherwise, ignore invalid formats instead of returning 400.
     if (hhmm) {
       where.push('openHour <= ?');
       params.push(hhmm);
@@ -96,10 +93,13 @@ async function handleMobilepostSearch(req, res) {
   }
 }
 
-
+// IMPORTANT: Register search routes BEFORE parameterized /:id route
+// Alias 1: canonical search path
 server.get('/mobilepost/search', handleMobilepostSearch);
+// Alias 2: allow GET /mobilepost?districtEN=...&openAt=...
 server.get('/mobilepost', handleMobilepostSearch);
 
+// GET by ID (placed after search routes to avoid shadowing)
 server.get('/mobilepost/:id', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
@@ -116,10 +116,10 @@ server.get('/mobilepost/:id', async (req, res) => {
   }
 });
 
+// (Removed duplicate inline search implementation in favor of shared handler)
 
-// new record
+// POST new record
 server.post('/mobilepost', async (req, res) => {
-  console.log('POST /mobilepost - creating record', req.body);
   const {
     mobileCode, dayOfWeekCode, seq,
     nameEN, districtEN, locationEN, addressEN,
@@ -151,7 +151,6 @@ server.post('/mobilepost', async (req, res) => {
 
   try {
     const [result] = await pool.query(sql, params);
-    console.log('POST /mobilepost - inserted id', result.insertId);
     res.json({ message: 'Record inserted', id: result.insertId });
   } catch (err) {
     console.error('Insert error:', err);
@@ -163,6 +162,7 @@ server.post('/mobilepost', async (req, res) => {
   }
 });
 
+// PUT (partial update)
 server.put('/mobilepost/:id', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
@@ -216,20 +216,14 @@ server.put('/mobilepost/:id', async (req, res) => {
 // DELETE
 server.delete('/mobilepost/:id', async (req, res) => {
   const id = Number(req.params.id);
-  console.log('DELETE /mobilepost/:id - request', { id });
   if (!Number.isInteger(id) || id <= 0) {
     res.status(400).send('Invalid ID');
     return;
   }
   try {
     const [result] = await pool.query('DELETE FROM mobilepost WHERE id = ?', [id]);
-    if (result.affectedRows === 0) {
-      console.log('DELETE /mobilepost/:id - not found', { id });
-      res.status(404).send('Not found');
-    } else {
-      console.log('DELETE /mobilepost/:id - deleted', { id });
-      res.json({ message: 'Record deleted', id });
-    }
+    if (result.affectedRows === 0) res.status(404).send('Not found');
+    else res.json({ message: 'Record deleted', id });
   } catch (err) {
     console.error('Delete error:', err);
     res.status(500).send('Delete error');
@@ -238,6 +232,5 @@ server.delete('/mobilepost/:id', async (req, res) => {
 
 // Start server
 server.listen(3001, () => {
-  console.log('Server started.');
+  console.log('Server started on http://localhost:3001');
 });
-
