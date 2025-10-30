@@ -271,3 +271,4 @@ server.delete('/mobilepost/:id', async (req, res) => {
 server.listen(3001, () => {
   console.log('Server started.');
 });
+
