@@ -196,6 +196,8 @@ server.post('/mobilepost', async (req, res) => {
 
 server.put('/mobilepost/:id', async (req, res) => {
   const id = Number(req.params.id);
+  console.log('PUT /mobilepost/:id - updating record', { id, updates: req.body });
+  
   if (!Number.isInteger(id) || id <= 0) {
     res.status(400).send('Invalid ID');
     return;
@@ -209,6 +211,7 @@ server.put('/mobilepost/:id', async (req, res) => {
 
   const sets = [];
   const params = [];
+  const updatedFields = [];
 
   for (const [k, v] of Object.entries(req.body || {})) {
     if (!allowed.has(k)) continue;
@@ -220,9 +223,11 @@ server.put('/mobilepost/:id', async (req, res) => {
       }
       sets.push(`${k} = ?`);
       params.push(t);
+      updatedFields.push({ field: k, value: t });
     } else {
       sets.push(`${k} = ?`);
       params.push(v ?? null);
+      updatedFields.push({ field: k, value: v ?? null });
     }
   }
 
@@ -236,8 +241,13 @@ server.put('/mobilepost/:id', async (req, res) => {
       `UPDATE mobilepost SET ${sets.join(', ')} WHERE id = ?`,
       [...params, id]
     );
-    if (result.affectedRows === 0) res.status(404).send('Not found');
-    else res.json({ message: 'Record updated', id });
+    if (result.affectedRows === 0) {
+      console.log('PUT /mobilepost/:id - not found', { id });
+      res.status(404).send('Not found');
+    } else {
+      console.log('PUT /mobilepost/:id - updated successfully', { id, updatedFields });
+      res.json({ message: 'Record updated', id });
+    }
   } catch (err) {
     console.error('Update error:', err);
     res.status(500).send('Update error');
