@@ -14,6 +14,45 @@ const pool = mysql.createPool({
   charset: 'utf8mb4_general_ci'
 });
 
+// Hierarchical Error Codes
+// 01xx - Validation Errors
+// 02xx - Missing/Required Field Errors
+// 03xx - Search/Query Errors
+// 05xx - Server/Database Errors
+const ERROR_CODES = {
+  // Validation Errors (01xx)
+  INVALID_ID: { code: '0100', message: 'Invalid ID format' },
+  INVALID_DAY_OF_WEEK: { code: '0101', message: 'dayOfWeekCode must be between 1 and 7' },
+  INVALID_TIME_FORMAT: { code: '0102', message: 'Invalid time format (use HH:MM)' },
+  INVALID_FIELD: { code: '0103', message: 'Invalid or disallowed field' },
+  
+  // Missing/Required Field Errors (02xx)
+  MISSING_REQUIRED_FIELDS: { code: '0200', message: 'Missing required fields' },
+  NO_FIELDS_TO_UPDATE: { code: '0201', message: 'No valid fields provided for update' },
+  
+  // Search/Query Errors (03xx)
+  NOT_FOUND: { code: '0300', message: 'Record not found' },
+  NO_RESULTS: { code: '0301', message: 'No results found for search criteria' },
+  WRONG_CRITERIA: { code: '0302', message: 'Wrong criteria, please check your input' },
+  
+  // Server/Database Errors (05xx)
+  DATABASE_ERROR: { code: '0500', message: 'Database operation failed' },
+  SQL_EXECUTION_ERROR: { code: '0501', message: 'SQL execution error' },
+  DUPLICATE_ENTRY: { code: '0502', message: 'Duplicate entry detected' },
+  INSERT_ERROR: { code: '0503', message: 'Insert operation failed' },
+  UPDATE_ERROR: { code: '0504', message: 'Update operation failed' },
+  DELETE_ERROR: { code: '0505', message: 'Delete operation failed' }
+};
+
+// Helper function to create error response
+function createErrorResponse(errorCode, customMessage = null) {
+  return {
+    success: false,
+    errcode: errorCode.code,
+    errmsg: customMessage || errorCode.message
+  };
+}
+
 // Helper to normalize HH:MM strings; returns null if invalid
 function normHHMM(v) {
   if (v == null) return null;
@@ -30,13 +69,16 @@ server.get('/', async (_req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM mobilepost');
     res.json({
+      success: true,
       message: 'Hello World',
       count: rows.length,
       data: rows
     });
   } catch (err) {
     console.error('SQL execution error:', err);
-    res.status(500).send('Database error');
+    const errorResponse = createErrorResponse(ERROR_CODES.SQL_EXECUTION_ERROR, err.message);
+    console.log('Error response:', errorResponse);
+    res.status(500).json(errorResponse);
   }
 });
 
@@ -58,8 +100,9 @@ async function handleMobilepostSearch(req, res) {
   if (dayOfWeekCode !== undefined) {
     const d = Number(dayOfWeekCode);
     if (!Number.isInteger(d) || d < 1 || d > 7) {
-      res.status(400).send('dayOfWeekCode must be 1..7');
-      return;
+      const errorResponse = createErrorResponse(ERROR_CODES.INVALID_DAY_OF_WEEK);
+      console.log('Error response:', errorResponse);
+      return res.status(400).json(errorResponse);
     }
     where.push('dayOfWeekCode = ?');
     params.push(d);
@@ -115,15 +158,16 @@ async function handleMobilepostSearch(req, res) {
     const [rows] = await pool.query(sql, params);
     if (rows.length === 0) {
       console.log('Wrong criteria, please type the right one');
-      return res.status(404).json({ 
-        error: 'No results found', 
-        message: 'Not found, please check your input criteria is it correct.' 
-      });
+      const errorResponse = createErrorResponse(ERROR_CODES.NO_RESULTS, 'No results found, please check your input criteria');
+      console.log('Error response:', errorResponse);
+      return res.status(404).json(errorResponse);
     }
-    res.json(rows);
+    res.json({ success: true, data: rows });
   } catch (err) {
     console.error('SQL execution error:', err);
-    res.status(500).send('Database error');
+    const errorResponse = createErrorResponse(ERROR_CODES.SQL_EXECUTION_ERROR, err.message);
+    console.log('Error response:', errorResponse);
+    res.status(500).json(errorResponse);
   }
 }
 
@@ -134,16 +178,23 @@ server.get('/mobilepost', handleMobilepostSearch);
 server.get('/mobilepost/:id', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    res.status(400).send('Invalid ID');
-    return;
+    const errorResponse = createErrorResponse(ERROR_CODES.INVALID_ID);
+    console.log('Error response:', errorResponse);
+    return res.status(400).json(errorResponse);
   }
   try {
     const [rows] = await pool.query('SELECT * FROM mobilepost WHERE id = ?', [id]);
-    if (rows.length === 0) res.status(404).send('Not found');
-    else res.json(rows[0]);
+    if (rows.length === 0) {
+      const errorResponse = createErrorResponse(ERROR_CODES.NOT_FOUND, `Record with ID ${id} not found`);
+      console.log('Error response:', errorResponse);
+      return res.status(404).json(errorResponse);
+    }
+    res.json({ success: true, data: rows[0] });
   } catch (err) {
     console.error('SQL execution error:', err);
-    res.status(500).send('Database error');
+    const errorResponse = createErrorResponse(ERROR_CODES.SQL_EXECUTION_ERROR, err.message);
+    console.log('Error response:', errorResponse);
+    res.status(500).json(errorResponse);
   }
 });
 
@@ -158,8 +209,12 @@ server.post('/mobilepost', async (req, res) => {
   } = req.body || {};
 
   if (!mobileCode || dayOfWeekCode == null || seq == null) {
-    res.status(400).send('Missing required fields: mobileCode, dayOfWeekCode, seq');
-    return;
+    const errorResponse = createErrorResponse(
+      ERROR_CODES.MISSING_REQUIRED_FIELDS, 
+      'Missing required fields: mobileCode, dayOfWeekCode, seq'
+    );
+    console.log('Error response:', errorResponse);
+    return res.status(400).json(errorResponse);
   }
 
   const sql = `
@@ -183,13 +238,24 @@ server.post('/mobilepost', async (req, res) => {
   try {
     const [result] = await pool.query(sql, params);
     console.log('POST /mobilepost - inserted id', result.insertId);
-    res.json({ message: 'Record inserted', id: result.insertId });
+    res.status(201).json({ 
+      success: true,
+      message: 'Record inserted', 
+      id: result.insertId 
+    });
   } catch (err) {
     console.error('Insert error:', err);
     if (String(err.message).includes('Duplicate')) {
-      res.status(409).send('Duplicate (mobileCode, dayOfWeekCode, seq)');
+      const errorResponse = createErrorResponse(
+        ERROR_CODES.DUPLICATE_ENTRY, 
+        'Duplicate (mobileCode, dayOfWeekCode, seq)'
+      );
+      console.log('Error response:', errorResponse);
+      res.status(409).json(errorResponse);
     } else {
-      res.status(500).send('Insert error');
+      const errorResponse = createErrorResponse(ERROR_CODES.INSERT_ERROR, err.message);
+      console.log('Error response:', errorResponse);
+      res.status(500).json(errorResponse);
     }
   }
 });
@@ -199,8 +265,9 @@ server.put('/mobilepost/:id', async (req, res) => {
   console.log('PUT /mobilepost/:id - updating record', { id, updates: req.body });
   
   if (!Number.isInteger(id) || id <= 0) {
-    res.status(400).send('Invalid ID');
-    return;
+    const errorResponse = createErrorResponse(ERROR_CODES.INVALID_ID);
+    console.log('Error response:', errorResponse);
+    return res.status(400).json(errorResponse);
   }
 
   const allowed = new Set([
@@ -218,8 +285,12 @@ server.put('/mobilepost/:id', async (req, res) => {
     if (k === 'openHour' || k === 'closeHour') {
       const t = v == null ? null : normHHMM(v);
       if (v != null && !t) {
-        res.status(400).send(`Invalid ${k} (use HH:MM)`);
-        return;
+        const errorResponse = createErrorResponse(
+          ERROR_CODES.INVALID_TIME_FORMAT, 
+          `Invalid ${k} (use HH:MM)`
+        );
+        console.log('Error response:', errorResponse);
+        return res.status(400).json(errorResponse);
       }
       sets.push(`${k} = ?`);
       params.push(t);
@@ -232,8 +303,9 @@ server.put('/mobilepost/:id', async (req, res) => {
   }
 
   if (sets.length === 0) {
-    res.status(400).send('No valid fields to update');
-    return;
+    const errorResponse = createErrorResponse(ERROR_CODES.NO_FIELDS_TO_UPDATE);
+    console.log('Error response:', errorResponse);
+    return res.status(400).json(errorResponse);
   }
 
   try {
@@ -243,14 +315,18 @@ server.put('/mobilepost/:id', async (req, res) => {
     );
     if (result.affectedRows === 0) {
       console.log('PUT /mobilepost/:id - not found', { id });
-      res.status(404).send('Not found');
+      const errorResponse = createErrorResponse(ERROR_CODES.NOT_FOUND, `Record with ID ${id} not found`);
+      console.log('Error response:', errorResponse);
+      return res.status(404).json(errorResponse);
     } else {
       console.log('PUT /mobilepost/:id - updated successfully', { id, updatedFields });
-      res.json({ message: 'Record updated', id });
+      res.json({ success: true, message: 'Record updated', id });
     }
   } catch (err) {
     console.error('Update error:', err);
-    res.status(500).send('Update error');
+    const errorResponse = createErrorResponse(ERROR_CODES.UPDATE_ERROR, err.message);
+    console.log('Error response:', errorResponse);
+    res.status(500).json(errorResponse);
   }
 });
 
@@ -259,21 +335,26 @@ server.delete('/mobilepost/:id', async (req, res) => {
   const id = Number(req.params.id);
   console.log('DELETE /mobilepost/:id - request', { id });
   if (!Number.isInteger(id) || id <= 0) {
-    res.status(400).send('Invalid ID');
-    return;
+    const errorResponse = createErrorResponse(ERROR_CODES.INVALID_ID);
+    console.log('Error response:', errorResponse);
+    return res.status(400).json(errorResponse);
   }
   try {
     const [result] = await pool.query('DELETE FROM mobilepost WHERE id = ?', [id]);
     if (result.affectedRows === 0) {
       console.log('DELETE /mobilepost/:id - not found', { id });
-      res.status(404).send('Not found');
+      const errorResponse = createErrorResponse(ERROR_CODES.NOT_FOUND, `Record with ID ${id} not found`);
+      console.log('Error response:', errorResponse);
+      return res.status(404).json(errorResponse);
     } else {
       console.log('DELETE /mobilepost/:id - deleted', { id });
-      res.json({ message: 'Record deleted', id });
+      res.json({ success: true, message: 'Record deleted', id });
     }
   } catch (err) {
     console.error('Delete error:', err);
-    res.status(500).send('Delete error');
+    const errorResponse = createErrorResponse(ERROR_CODES.DELETE_ERROR, err.message);
+    console.log('Error response:', errorResponse);
+    res.status(500).json(errorResponse);
   }
 });
 
@@ -281,4 +362,5 @@ server.delete('/mobilepost/:id', async (req, res) => {
 server.listen(3001, () => {
   console.log('Server started.');
 });
+
 
