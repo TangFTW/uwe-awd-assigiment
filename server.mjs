@@ -14,28 +14,28 @@ const pool = mysql.createPool({
   charset: 'utf8mb4_general_ci'
 });
 
-// Hierarchical Error Codes
+// Hierarchical Error Codes (reference)
 // 01xx - Validation Errors
 // 02xx - Missing/Required Field Errors
 // 03xx - Search/Query Errors
 // 05xx - Server/Database Errors
 const ERROR_CODES = {
-  // Validation Errors (01xx)
+  //(01xx)
   INVALID_ID: { code: '0100', message: 'Invalid ID format' },
   INVALID_DAY_OF_WEEK: { code: '0101', message: 'dayOfWeekCode must be between 1 and 7' },
   INVALID_TIME_FORMAT: { code: '0102', message: 'Invalid time format (use HH:MM)' },
   INVALID_FIELD: { code: '0103', message: 'Invalid or disallowed field' },
   
-  // Missing/Required Field Errors (02xx)
+  //  (02xx)
   MISSING_REQUIRED_FIELDS: { code: '0200', message: 'Missing required fields' },
   NO_FIELDS_TO_UPDATE: { code: '0201', message: 'No valid fields provided for update' },
   
-  // Search/Query Errors (03xx)
+  //  (03xx)
   NOT_FOUND: { code: '0300', message: 'Record not found' },
   NO_RESULTS: { code: '0301', message: 'No results found for search criteria' },
   WRONG_CRITERIA: { code: '0302', message: 'Wrong criteria, please check your input' },
   
-  // Server/Database Errors (05xx)
+  // (05xx)
   DATABASE_ERROR: { code: '0500', message: 'Database operation failed' },
   SQL_EXECUTION_ERROR: { code: '0501', message: 'SQL execution error' },
   DUPLICATE_ENTRY: { code: '0502', message: 'Duplicate entry detected' },
@@ -362,5 +362,3 @@ server.delete('/mobilepost/:id', async (req, res) => {
 server.listen(3001, () => {
   console.log('Server started.');
 });
-
-
