@@ -14,28 +14,28 @@ const pool = mysql.createPool({
   charset: 'utf8mb4_general_ci'
 });
 
-// Hierarchical Error Codes (reference)
+// z
 // 01xx - Validation Errors
 // 02xx - Missing/Required Field Errors
 // 03xx - Search/Query Errors
 // 05xx - Server/Database Errors
 const ERROR_CODES = {
-  //(01xx)
+  // Validation Errors (01xx)
   INVALID_ID: { code: '0100', message: 'Invalid ID format' },
   INVALID_DAY_OF_WEEK: { code: '0101', message: 'dayOfWeekCode must be between 1 and 7' },
   INVALID_TIME_FORMAT: { code: '0102', message: 'Invalid time format (use HH:MM)' },
   INVALID_FIELD: { code: '0103', message: 'Invalid or disallowed field' },
   
-  //  (02xx)
+  // Missing/Required Field Errors (02xx)
   MISSING_REQUIRED_FIELDS: { code: '0200', message: 'Missing required fields' },
   NO_FIELDS_TO_UPDATE: { code: '0201', message: 'No valid fields provided for update' },
   
-  //  (03xx)
+  // Search/Query Errors (03xx)
   NOT_FOUND: { code: '0300', message: 'Record not found' },
   NO_RESULTS: { code: '0301', message: 'No results found for search criteria' },
   WRONG_CRITERIA: { code: '0302', message: 'Wrong criteria, please check your input' },
   
-  // (05xx)
+  // Server/Database Errors (05xx)
   DATABASE_ERROR: { code: '0500', message: 'Database operation failed' },
   SQL_EXECUTION_ERROR: { code: '0501', message: 'SQL execution error' },
   DUPLICATE_ENTRY: { code: '0502', message: 'Duplicate entry detected' },
@@ -63,6 +63,11 @@ function normHHMM(v) {
   return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
 }
 
+// Helper to check if a value is a non-empty string
+function isNonEmptyString(v) {
+  return typeof v === 'string' && v.trim().length > 0;
+}
+
 
 server.get('/', async (_req, res) => {
   console.log('Welcome to the HKPO Mobile Post API');
@@ -85,7 +90,21 @@ server.get('/', async (_req, res) => {
 // Shared search handler
 async function handleMobilepostSearch(req, res) {
   const { districtEN, dayOfWeekCode, mobileCode, openAt, addressEN, locationEN, addressTC, addressSC, addressZH } = req.query;
-  if (districtEN) {
+  
+  // Validate that if string params are provided, they must not be empty
+  const stringParams = { districtEN, mobileCode, addressEN, locationEN, addressTC, addressSC, addressZH };
+  for (const [key, value] of Object.entries(stringParams)) {
+    if (value !== undefined && !isNonEmptyString(value)) {
+      const errorResponse = createErrorResponse(
+        ERROR_CODES.WRONG_CRITERIA, 
+        `${key} cannot be empty. Please provide a valid value.`
+      );
+      console.log('Error response:', errorResponse);
+      return res.status(400).json(errorResponse);
+    }
+  }
+  
+  if (isNonEmptyString(districtEN)) {
     console.log('Get records by district', districtEN);
   } else {
     console.log( 'Search mobilepost', req.query);
@@ -93,7 +112,7 @@ async function handleMobilepostSearch(req, res) {
   const where = [];
   const params = [];
 
-  if (districtEN) {
+  if (isNonEmptyString(districtEN)) {
     where.push('districtEN = ?');
     params.push(districtEN);
   }
@@ -107,30 +126,30 @@ async function handleMobilepostSearch(req, res) {
     where.push('dayOfWeekCode = ?');
     params.push(d);
   }
-  if (mobileCode) {
+  if (isNonEmptyString(mobileCode)) {
     where.push('mobileCode = ?');
     params.push(mobileCode);
   }
   // English address/location substring filters
-  if (addressEN) {
+  if (isNonEmptyString(addressEN)) {
     where.push('addressEN LIKE ?');
     params.push(`%${addressEN}%`);
   }
-  if (locationEN) {
+  if (isNonEmptyString(locationEN)) {
     where.push('locationEN LIKE ?');
     params.push(`%${locationEN}%`);
   }
   // Chinese TC/SC address substring filters
-  if (addressTC) {
+  if (isNonEmptyString(addressTC)) {
     where.push('addressTC LIKE ?');
     params.push(`%${addressTC}%`);
   }
-  if (addressSC) {
+  if (isNonEmptyString(addressSC)) {
     where.push('addressSC LIKE ?');
     params.push(`%${addressSC}%`);
   }
   // addressZH matches either TC or SC
-  if (addressZH) {
+  if (isNonEmptyString(addressZH)) {
     where.push('(addressTC LIKE ? OR addressSC LIKE ?)');
     params.push(`%${addressZH}%`, `%${addressZH}%`);
   }
@@ -237,25 +256,51 @@ server.post('/mobilepost', async (req, res) => {
 
   try {
     const [result] = await pool.query(sql, params);
+    if (!result.insertId) {
+      console.error('POST /mobilepost - insert failed, no insertId returned');
+      const errorResponse = createErrorResponse(
+        ERROR_CODES.INSERT_ERROR, 
+        'Failed to create record. The database did not return an ID.'
+      );
+      console.log('Error response:', errorResponse);
+      return res.status(500).json(errorResponse);
+    }
     console.log('POST /mobilepost - inserted id', result.insertId);
     res.status(201).json({ 
       success: true,
-      message: 'Record inserted', 
+      message: 'Record created successfully', 
       id: result.insertId 
     });
   } catch (err) {
-    console.error('Insert error:', err);
-    if (String(err.message).includes('Duplicate')) {
+    console.error('POST /mobilepost - insert error:', err);
+    if (String(err.message).includes('Duplicate') || err.code === 'ER_DUP_ENTRY') {
       const errorResponse = createErrorResponse(
         ERROR_CODES.DUPLICATE_ENTRY, 
-        'Duplicate (mobileCode, dayOfWeekCode, seq)'
+        `Failed to create record. A record with mobileCode "${mobileCode}", dayOfWeekCode ${dayOfWeekCode}, and seq ${seq} already exists.`
       );
       console.log('Error response:', errorResponse);
-      res.status(409).json(errorResponse);
-    } else {
-      const errorResponse = createErrorResponse(ERROR_CODES.INSERT_ERROR, err.message);
+      return res.status(409).json(errorResponse);
+    } else if (err.code === 'ER_BAD_NULL_ERROR' || err.code === 'ER_NO_DEFAULT_FOR_FIELD') {
+      const errorResponse = createErrorResponse(
+        ERROR_CODES.MISSING_REQUIRED_FIELDS, 
+        `Failed to create record. Missing required fields: ${err.message}`
+      );
       console.log('Error response:', errorResponse);
-      res.status(500).json(errorResponse);
+      return res.status(400).json(errorResponse);
+    } else if (err.code === 'ER_DATA_TOO_LONG' || err.code === 'ER_TRUNCATED_WRONG_VALUE') {
+      const errorResponse = createErrorResponse(
+        ERROR_CODES.INVALID_DATA, 
+        `Failed to create record. Invalid data format: ${err.message}`
+      );
+      console.log('Error response:', errorResponse);
+      return res.status(400).json(errorResponse);
+    } else {
+      const errorResponse = createErrorResponse(
+        ERROR_CODES.INSERT_ERROR, 
+        `Failed to create record. Database error: ${err.message}`
+      );
+      console.log('Error response:', errorResponse);
+      return res.status(500).json(errorResponse);
     }
   }
 });
@@ -315,18 +360,52 @@ server.put('/mobilepost/:id', async (req, res) => {
     );
     if (result.affectedRows === 0) {
       console.log('PUT /mobilepost/:id - not found', { id });
-      const errorResponse = createErrorResponse(ERROR_CODES.NOT_FOUND, `Record with ID ${id} not found`);
+      const errorResponse = createErrorResponse(
+        ERROR_CODES.NOT_FOUND, 
+        `Failed to update record. Record with ID ${id} not found.`
+      );
       console.log('Error response:', errorResponse);
       return res.status(404).json(errorResponse);
+    } else if (result.changedRows === 0) {
+      console.log('PUT /mobilepost/:id - no changes detected', { id });
+      res.json({ 
+        success: true, 
+        message: 'No changes detected. The record already has these values.', 
+        id 
+      });
     } else {
       console.log('PUT /mobilepost/:id - updated successfully', { id, updatedFields });
-      res.json({ success: true, message: 'Record updated', id });
+      res.json({ 
+        success: true, 
+        message: 'Record updated successfully', 
+        id,
+        updatedFields: updatedFields.map(f => f.field)
+      });
     }
   } catch (err) {
-    console.error('Update error:', err);
-    const errorResponse = createErrorResponse(ERROR_CODES.UPDATE_ERROR, err.message);
-    console.log('Error response:', errorResponse);
-    res.status(500).json(errorResponse);
+    console.error('PUT /mobilepost/:id - update error:', err);
+    if (err.code === 'ER_DATA_TOO_LONG' || err.code === 'ER_TRUNCATED_WRONG_VALUE') {
+      const errorResponse = createErrorResponse(
+        ERROR_CODES.INVALID_DATA, 
+        `Failed to update record. Invalid data format: ${err.message}`
+      );
+      console.log('Error response:', errorResponse);
+      return res.status(400).json(errorResponse);
+    } else if (err.code === 'ER_BAD_NULL_ERROR') {
+      const errorResponse = createErrorResponse(
+        ERROR_CODES.INVALID_DATA, 
+        `Failed to update record. Cannot set required field to null: ${err.message}`
+      );
+      console.log('Error response:', errorResponse);
+      return res.status(400).json(errorResponse);
+    } else {
+      const errorResponse = createErrorResponse(
+        ERROR_CODES.UPDATE_ERROR, 
+        `Failed to update record. Database error: ${err.message}`
+      );
+      console.log('Error response:', errorResponse);
+      return res.status(500).json(errorResponse);
+    }
   }
 });
 
@@ -343,18 +422,37 @@ server.delete('/mobilepost/:id', async (req, res) => {
     const [result] = await pool.query('DELETE FROM mobilepost WHERE id = ?', [id]);
     if (result.affectedRows === 0) {
       console.log('DELETE /mobilepost/:id - not found', { id });
-      const errorResponse = createErrorResponse(ERROR_CODES.NOT_FOUND, `Record with ID ${id} not found`);
+      const errorResponse = createErrorResponse(
+        ERROR_CODES.NOT_FOUND, 
+        `Failed to delete record. Record with ID ${id} not found.`
+      );
       console.log('Error response:', errorResponse);
       return res.status(404).json(errorResponse);
     } else {
-      console.log('DELETE /mobilepost/:id - deleted', { id });
-      res.json({ success: true, message: 'Record deleted', id });
+      console.log('DELETE /mobilepost/:id - deleted successfully', { id });
+      res.json({ 
+        success: true, 
+        message: 'Record deleted successfully', 
+        id 
+      });
     }
   } catch (err) {
-    console.error('Delete error:', err);
-    const errorResponse = createErrorResponse(ERROR_CODES.DELETE_ERROR, err.message);
-    console.log('Error response:', errorResponse);
-    res.status(500).json(errorResponse);
+    console.error('DELETE /mobilepost/:id - delete error:', err);
+    if (err.code === 'ER_ROW_IS_REFERENCED_2' || err.code === 'ER_ROW_IS_REFERENCED') {
+      const errorResponse = createErrorResponse(
+        ERROR_CODES.DELETE_ERROR, 
+        `Failed to delete record. Record with ID ${id} is referenced by other records and cannot be deleted.`
+      );
+      console.log('Error response:', errorResponse);
+      return res.status(409).json(errorResponse);
+    } else {
+      const errorResponse = createErrorResponse(
+        ERROR_CODES.DELETE_ERROR, 
+        `Failed to delete record. Database error: ${err.message}`
+      );
+      console.log('Error response:', errorResponse);
+      return res.status(500).json(errorResponse);
+    }
   }
 });
 
