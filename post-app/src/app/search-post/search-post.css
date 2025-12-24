@@ -1,0 +1,309 @@
+/* Container */
+.search-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* Header */
+.search-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-header h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+}
+
+.search-header p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.btn-close {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: none;
+    padding: 0.625rem 1.25rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-close:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
+}
+
+/* Mode Selector */
+.mode-selector {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    background: #f9fafb;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.mode-selector button {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.mode-selector button:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+}
+
+.mode-selector button.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: transparent;
+}
+
+/* Search Form */
+.search-form {
+    padding: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #374151;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-search {
+    width: 100%;
+    padding: 0.875rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-search:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Results Section */
+.results-section {
+    padding: 2rem;
+    border-top: 2px solid #e5e7eb;
+}
+
+.results-section h2 {
+    margin: 0 0 1.5rem 0;
+    color: #1f2937;
+}
+
+/* Table Styles */
+.table-container {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+.results-table {
+    width: 100%;
+    min-width: 1400px;
+    border-collapse: collapse;
+    background: white;
+    font-size: 0.85rem;
+}
+
+.results-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.results-table th {
+    padding: 0.75rem 0.5rem;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+    font-size: 0.8rem;
+}
+
+.results-table td {
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    color: #374151;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.results-table td:empty::before {
+    content: '—';
+    color: #9ca3af;
+}
+
+.results-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    color: #374151;
+}
+
+.results-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+.results-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Make action column sticky */
+.results-table th:last-child,
+.results-table td:last-child {
+    position: sticky;
+    right: 0;
+    background: white;
+    box-shadow: -2px 0 4px rgba(0,0,0,0.05);
+}
+
+.results-table thead th:last-child {
+    background: #764ba2;
+}
+
+/* Action Buttons */
+.btn-edit {
+    background: #dbeafe;
+    color: #1d4ed8;
+    border: 1px solid #93c5fd;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    margin-right: 0.5rem;
+}
+
+.btn-edit:hover {
+    background: #93c5fd;
+    transform: scale(1.05);
+}
+
+/* Delete Button */
+.btn-delete {
+    background: #fee;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.25rem;
+    transition: all 0.2s;
+}
+
+.btn-delete:hover {
+    background: #fecaca;
+    transform: scale(1.1);
+}
+
+/* No Results */
+.no-results {
+    padding: 3rem;
+    text-align: center;
+    color: #6b7280;
+    font-size: 1.1rem;
+    background-color: #f9f9f9;
+}
+
+
+/* Title within a result */
+.result-title {
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+/* Body/excerpt within a result */
+.result-body {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Edit Button */
+.btn-edit {
+    background: #fef3c7;
+    color: #d97706;
+    border: 1px solid #fde68a;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    margin-right: 0.5rem;
+}
+
+.btn-edit:hover {
+    background: #fde68a;
+    transform: scale(1.05);
+}
+
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}

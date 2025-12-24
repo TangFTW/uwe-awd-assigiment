@@ -1,0 +1,162 @@
+<div class="search-container">
+  <header class="search-header">
+    <div>
+      <h1>🔍 Search Mobile Post Offices</h1>
+      <p>Find mobile post offices across Hong Kong</p>
+    </div>
+    <button class="btn-close" type="button" (click)="close()">Close</button>
+  </header>
+
+  <!-- Search Mode Selector -->
+  <div class="mode-selector">
+    <button [class.active]="searchMode === 'district'" (click)="searchMode = 'district'">
+      📍 District
+    </button>
+    <button [class.active]="searchMode === 'day'" (click)="searchMode = 'day'">
+      📅 Day of Week
+    </button>
+    <button [class.active]="searchMode === 'location'" (click)="searchMode = 'location'">
+      🏢 Location
+    </button>
+    <button [class.active]="searchMode === 'address'" (click)="searchMode = 'address'">
+      🗺️ Address
+    </button>
+  </div>
+
+  <!-- Search Form -->
+  <form class="search-form" (ngSubmit)="onSearch()">
+    <!-- District Search -->
+    @if (searchMode === 'district') {
+    <div class="form-group">
+      <label for="district">District (EN)</label>
+      <input
+        id="district"
+        type="text"
+        [(ngModel)]="districtInput"
+        name="district"
+        placeholder="e.g. Tsuen Wan, Sai Kung"
+        class="form-input"
+      />
+    </div>
+    }
+
+    <!-- Day of Week Search -->
+    @if (searchMode === 'day') {
+    <div class="form-group">
+      <label for="day">Day of Week (1-7)</label>
+      <input
+        id="day"
+        type="number"
+        [(ngModel)]="dayInput"
+        name="day"
+        min="1"
+        max="7"
+        placeholder="1=Mon, 7=Sun"
+        class="form-input"
+      />
+    </div>
+    }
+
+    <!-- Location Search -->
+    @if (searchMode === 'location') {
+    <div class="form-group">
+      <label for="location">Location (EN)</label>
+      <input
+        id="location"
+        type="text"
+        [(ngModel)]="locationInput"
+        name="location"
+        placeholder="e.g. Sham Tseng, Pui O"
+        class="form-input"
+      />
+    </div>
+    }
+
+    <!-- Address Search -->
+    @if (searchMode === 'address') {
+    <div class="form-group">
+      <label for="address">Address (EN)</label>
+      <input
+        id="address"
+        type="text"
+        [(ngModel)]="addressInput"
+        name="address"
+        placeholder="e.g. Castle Peak Road"
+        class="form-input"
+      />
+    </div>
+    }
+
+    <button type="submit" class="btn-search">🔍 Search</button>
+  </form>
+
+  <!-- Results Table -->
+  @if (posts.length > 0) {
+  <div class="results-section">
+    <h2>Found {{ posts.length }} records</h2>
+    <div class="table-container">
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Mobile Code</th>
+            <th>District</th>
+            <th>地區</th>
+            <th>地区</th>
+            <th>Location</th>
+            <th>地點</th>
+            <th>地点</th>
+            <th>Address</th>
+            <th>地址</th>
+            <th>地址</th>
+            <th>Day</th>
+            <th>Open</th>
+            <th>Close</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (post of posts; track post.id) {
+          <tr>
+            <td>{{ post.id }}</td>
+            <td>{{ post.mobileCode }}</td>
+            <td>{{ post.districtEN || '—' }}</td>
+            <td>{{ post.districtTC || '—' }}</td>
+            <td>{{ post.districtSC || '—' }}</td>
+            <td>{{ post.locationEN || '—' }}</td>
+            <td>{{ post.locationTC || '—' }}</td>
+            <td>{{ post.locationSC || '—' }}</td>
+            <td>{{ post.addressEN || '—' }}</td>
+            <td>{{ post.addressTC || '—' }}</td>
+            <td>{{ post.addressSC || '—' }}</td>
+            <td>{{ post.dayOfWeekCode }}</td>
+            <td>{{ post.openHour }}</td>
+            <td>{{ post.closeHour }}</td>
+            <td>
+              <button class="btn-edit" (click)="onEdit(post)">✏️ Edit</button>
+              <button class="btn-delete" (click)="onDelete(post.id)">🗑️</button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+  } @if (posts.length === 0 && searched) {
+  <div class="no-results">
+    <p>No records found. Try different search criteria.</p>
+  </div>
+  }
+</div>
+
+<!-- Update Post Modal -->
+@if (showUpdateModal()) {
+<div class="modal-overlay" (click)="closeUpdateModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <app-update-post
+      [postData]="selectedPost()"
+      (closeModal)="closeUpdateModal()"
+    ></app-update-post>
+  </div>
+</div>
+}

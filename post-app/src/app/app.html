@@ -1,0 +1,82 @@
+
+<!-- Hero -->
+<section class="hero-section">
+  <div class="hero-content">
+    <h1>🏤 Hong Kong Mobile Post Office Finder</h1>
+    <p class="tagline">
+      Search, manage, and locate mobile post offices across Hong Kong
+    </p>
+
+    <div class="action-buttons">
+      <button class="btn btn-primary" (click)="openCreateForm()">➕ Create New Record</button>
+      <a class="btn btn-secondary">Browse/Update Records(Admin Only)</a>
+    </div>
+  </div>
+</section>
+
+<!-- Quick Search -->
+<div class="container">
+  <header class="section-header">
+    <h2>Quick Search</h2>
+    <p>Find mobile post offices by different criteria</p>
+  </header>
+
+  <div class="search-grid">
+    <article class="search-card">
+      <div class="card-icon">📍</div>
+      <h3>By District</h3>
+      <p>Search for mobile post offices in specific districts.</p>
+      <a class="card-link" (click)="openSearchForm('district')">Search by District →</a>
+    </article>
+
+    <article class="search-card">
+      <div class="card-icon">📅</div>
+      <h3>By Day of Week</h3>
+      <p>Find which offices operate on specific days.</p>
+      <a class="card-link" (click)="openSearchForm('day')">Search by Day →</a>
+    </article>
+
+    <article class="search-card">
+      <div class="card-icon">🏢</div>
+      <h3>By Location</h3>
+      <p>Search by location name or area (locationEN).</p>
+      <a class="card-link" (click)="openSearchForm('location')">Search by Location →</a>
+    </article>
+
+    <article class="search-card">
+      <div class="card-icon">🗺️</div>
+      <h3>By Address</h3>
+      <p>Find mobile post offices by street address.</p>
+      <a class="card-link" (click)="openSearchForm('address')">Search by Address →</a>
+    </article>
+  </div>
+
+  <!-- Info -->
+  <section class="info-section">
+    <div class="info-card">
+      <h3>About Mobile Post Offices</h3>
+      <p>
+        Mobile post offices provide essential postal services across different rutial areas in Hong Kong.
+        They operate on scheduled days and locations to serve communities efficiently.
+      </p>
+       </div>
+  </section>
+</div>
+
+<!-- Create Post Modal -->
+@if (showCreateForm()) {
+  <div class="modal-overlay" (click)="closeCreateForm()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <app-create-post (closeModal)="closeCreateForm()"></app-create-post>
+    </div>
+  </div>
+}
+
+<!-- Search Post Modal -->
+@if (showSearchForm()) {
+  <div class="modal-overlay" (click)="closeSearchForm()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <app-search-post [initialMode]="searchMode()" (closeModal)="closeSearchForm()"></app-search-post>
+    </div>
+  </div>
+}
