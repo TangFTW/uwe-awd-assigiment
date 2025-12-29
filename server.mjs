@@ -14,7 +14,7 @@ const pool = mysql.createPool({
   charset: 'utf8mb4_general_ci'
 });
 
-// z
+// error index
 // 01xx - Validation Errors
 // 02xx - Missing/Required Field Errors
 // 03xx - Search/Query Errors
@@ -164,8 +164,10 @@ async function handleMobilepostSearch(req, res) {
   }
 
   const sql = `
-    SELECT id, mobileCode, nameEN, districtEN, locationEN, addressEN,
-           locationTC, locationSC, addressTC, addressSC,
+    SELECT id, mobileCode, nameEN, nameTC, nameSC,
+           districtEN, districtTC, districtSC,
+           locationEN, locationTC, locationSC,
+           addressEN, addressTC, addressSC,
            dayOfWeekCode, openHour, closeHour, latitude, longitude
     FROM mobilepost
     ${where.length ? 'WHERE ' + where.join(' AND ') : ''}
@@ -223,8 +225,12 @@ server.post('/mobilepost', async (req, res) => {
   console.log('POST /mobilepost - creating record', req.body);
   const {
     mobileCode, dayOfWeekCode, seq,
-    nameEN, districtEN, locationEN, addressEN,
-    openHour, closeHour
+    nameEN, nameTC, nameSC,
+    districtEN, districtTC, districtSC,
+    locationEN, locationTC, locationSC,
+    addressEN, addressTC, addressSC,
+    openHour, closeHour,
+    latitude, longitude
   } = req.body || {};
 
   if (!mobileCode || dayOfWeekCode == null || seq == null) {
@@ -239,19 +245,33 @@ server.post('/mobilepost', async (req, res) => {
   const sql = `
     INSERT INTO mobilepost (
       mobileCode, dayOfWeekCode, seq,
-      nameEN, districtEN, locationEN, addressEN, openHour, closeHour
-    ) VALUES (?,?,?,?,?,?,?,?,?)
+      nameEN, nameTC, nameSC,
+      districtEN, districtTC, districtSC,
+      locationEN, locationTC, locationSC,
+      addressEN, addressTC, addressSC,
+      openHour, closeHour, latitude, longitude
+    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
   `;
   const params = [
     mobileCode,
     Number(dayOfWeekCode),
     Number(seq),
-    nameEN ?? null,
-    districtEN ?? null,
-    locationEN ?? null,
-    addressEN ?? null,
-    openHour ?? null,
-    closeHour ?? null
+    nameEN || '',
+    nameTC || '',
+    nameSC || '',
+    districtEN || '',
+    districtTC || '',
+    districtSC || '',
+    locationEN || '',
+    locationTC || '',
+    locationSC || '',
+    addressEN || '',
+    addressTC || '',
+    addressSC || '',
+    openHour || '00:00',
+    closeHour || '00:00',
+    latitude || 0,
+    longitude || 0
   ];
 
   try {
@@ -460,3 +480,4 @@ server.delete('/mobilepost/:id', async (req, res) => {
 server.listen(3001, () => {
   console.log('Server started.');
 });
+
