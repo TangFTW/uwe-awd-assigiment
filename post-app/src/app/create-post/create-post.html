@@ -11,19 +11,21 @@
 	</header>
 
 	<div class="create-post__card">
-		<form class="create-post__form" (ngSubmit)="submit()">
+		<form class="create-post__form" [formGroup]="form" (ngSubmit)="submit()">
 			<div class="create-post__grid">
 				<div class="field">
 					<label class="field__label" for="mobileCode">Mobile Code <span class="field__req">*</span></label>
 					<input
 						id="mobileCode"
-						name="mobileCode"
+						formControlName="mobileCode"
 						class="field__input"
-						[(ngModel)]="form.mobileCode"
+						[class.field__input--error]="hasError('mobileCode')"
 						placeholder="e.g. M001"
-						required
 						autocomplete="off"
 					/>
+					@if (hasError('mobileCode')) {
+						<div class="field__error">{{ getErrorMessage('mobileCode') }}</div>
+					}
 					<div class="field__help">Unique mobile post office code.</div>
 				</div>
 
@@ -31,14 +33,16 @@
 					<label class="field__label" for="dayOfWeekCode">Day Of Week (1–7) <span class="field__req">*</span></label>
 					<input
 						id="dayOfWeekCode"
-						name="dayOfWeekCode"
+						formControlName="dayOfWeekCode"
 						type="number"
 						min="1"
 						max="7"
 						class="field__input"
-						[(ngModel)]="form.dayOfWeekCode"
-						required
+						[class.field__input--error]="hasError('dayOfWeekCode')"
 					/>
+					@if (hasError('dayOfWeekCode')) {
+						<div class="field__error">{{ getErrorMessage('dayOfWeekCode') }}</div>
+					}
 					<div class="field__help">1=Mon … 7=Sun (based on your DB).</div>
 				</div>
 
@@ -46,13 +50,15 @@
 					<label class="field__label" for="seq">Seq <span class="field__req">*</span></label>
 					<input
 						id="seq"
-						name="seq"
+						formControlName="seq"
 						type="number"
 						min="1"
 						class="field__input"
-						[(ngModel)]="form.seq"
-						required
+						[class.field__input--error]="hasError('seq')"
 					/>
+					@if (hasError('seq')) {
+						<div class="field__error">{{ getErrorMessage('seq') }}</div>
+					}
 					<div class="field__help">Must be unique per mobileCode + day combination.</div>
 				</div>
 
@@ -60,9 +66,8 @@
 					<label class="field__label" for="nameEN">Name (EN)</label>
 					<input
 						id="nameEN"
-						name="nameEN"
+						formControlName="nameEN"
 						class="field__input"
-						[(ngModel)]="form.nameEN"
 						placeholder="Optional"
 					/>
 				</div>
@@ -71,9 +76,8 @@
 					<label class="field__label" for="nameTC">Name (TC)</label>
 					<input
 						id="nameTC"
-						name="nameTC"
+						formControlName="nameTC"
 						class="field__input"
-						[(ngModel)]="form.nameTC"
 						placeholder="Name (Traditional Chinese)"
 					/>
 				</div>
@@ -82,21 +86,22 @@
 					<label class="field__label" for="districtEN">District (EN) <span class="field__req">*</span></label>
 					<input
 						id="districtEN"
-						name="districtEN"
+						formControlName="districtEN"
 						class="field__input"
-						[(ngModel)]="form.districtEN"
+						[class.field__input--error]="hasError('districtEN')"
 						placeholder="e.g. Tsuen Wan"
-						required
 					/>
+					@if (hasError('districtEN')) {
+						<div class="field__error">{{ getErrorMessage('districtEN') }}</div>
+					}
 				</div>
 
 				<div class="field">
 					<label class="field__label" for="districtTC">District (TC)</label>
 					<input
 						id="districtTC"
-						name="districtTC"
+						formControlName="districtTC"
 						class="field__input"
-						[(ngModel)]="form.districtTC"
 						placeholder="District (Traditional Chinese)"
 					/>
 				</div>
@@ -104,9 +109,8 @@
 				<div class="field">				<label class="field__label" for="districtSC">District (SC)</label>
 				<input
 					id="districtSC"
-					name="districtSC"
+					formControlName="districtSC"
 					class="field__input"
-					[(ngModel)]="form.districtSC"
 					placeholder="District (Simplified Chinese)"
 				/>
 			</div>
@@ -114,21 +118,22 @@
 			<div class="field">					<label class="field__label" for="locationEN">Location (EN) <span class="field__req">*</span></label>
 					<input
 						id="locationEN"
-						name="locationEN"
+						formControlName="locationEN"
 						class="field__input"
-						[(ngModel)]="form.locationEN"
+						[class.field__input--error]="hasError('locationEN')"
 						placeholder="e.g. Sham Tseng"
-						required
 					/>
+					@if (hasError('locationEN')) {
+						<div class="field__error">{{ getErrorMessage('locationEN') }}</div>
+					}
 				</div>
 
 				<div class="field">
 					<label class="field__label" for="locationTC">Location (TC)</label>
 					<input
 						id="locationTC"
-						name="locationTC"
+						formControlName="locationTC"
 						class="field__input"
-						[(ngModel)]="form.locationTC"
 						placeholder="Location (Traditional Chinese)"
 					/>
 				</div>
@@ -136,9 +141,8 @@
 				<label class="field__label" for="locationSC">Location (SC)</label>
 				<input
 					id="locationSC"
-					name="locationSC"
+					formControlName="locationSC"
 					class="field__input"
-					[(ngModel)]="form.locationSC"
 					placeholder="Location (Simplified Chinese)"
 				/>
 			</div>
@@ -146,21 +150,22 @@
 					<label class="field__label" for="addressEN">Address (EN) <span class="field__req">*</span></label>
 					<input
 						id="addressEN"
-						name="addressEN"
+						formControlName="addressEN"
 						class="field__input"
-						[(ngModel)]="form.addressEN"
+						[class.field__input--error]="hasError('addressEN')"
 						placeholder="Full street address"
-						required
 					/>
+					@if (hasError('addressEN')) {
+						<div class="field__error">{{ getErrorMessage('addressEN') }}</div>
+					}
 				</div>
 
 				<div class="field field--full">
 					<label class="field__label" for="addressTC">Address (TC)</label>
 					<input
 						id="addressTC"
-						name="addressTC"
+						formControlName="addressTC"
 						class="field__input"
-						[(ngModel)]="form.addressTC"
 						placeholder="Address (Traditional Chinese)"
 					/>
 				</div>
@@ -168,9 +173,8 @@
 				<label class="field__label" for="addressSC">Address (SC)</label>
 				<input
 					id="addressSC"
-					name="addressSC"
+					formControlName="addressSC"
 					class="field__input"
-					[(ngModel)]="form.addressSC"
 					placeholder="Address (Simplified Chinese)"
 				/>
 			</div>
@@ -178,14 +182,16 @@
 					<label class="field__label" for="openHour">Open Hour <span class="field__req">*</span></label>
 					<input
 						id="openHour"
-						name="openHour"
+						formControlName="openHour"
 						class="field__input"
-						[(ngModel)]="form.openHour"
+						[class.field__input--error]="hasError('openHour')"
 					placeholder="09:00:00"
 					inputmode="numeric"
 					autocomplete="off"
-					required
 				/>
+				@if (hasError('openHour')) {
+					<div class="field__error">{{ getErrorMessage('openHour') }}</div>
+				}
 				<div class="field__help">Format: HH:MM:SS</div>
 			</div>
 
@@ -193,33 +199,40 @@
 				<label class="field__label" for="closeHour">Close Hour <span class="field__req">*</span></label>
 				<input
 					id="closeHour"
-					name="closeHour"
+					formControlName="closeHour"
 					class="field__input"
-					[(ngModel)]="form.closeHour"
+					[class.field__input--error]="hasError('closeHour')"
 					placeholder="17:00:00"
 					inputmode="numeric"
 					autocomplete="off"
-					required
 				/>
+				@if (hasError('closeHour')) {
+					<div class="field__error">{{ getErrorMessage('closeHour') }}</div>
+				}
 				<div class="field__help">Format: HH:MM:SS</div>
-						type="number"
-						step="0.000001"
-						class="field__input"
-						[(ngModel)]="form.latitude"
-						placeholder="22.123456"
-					/>
-					<div class="field__help">GPS latitude coordinate (decimal)</div>
-				</div>
+			</div>
 
-				<div class="field">
+			<div class="field">
+				<label class="field__label" for="latitude">Latitude</label>
+				<input
+					id="latitude"
+					type="number"
+					step="0.000001"
+					class="field__input"
+					formControlName="latitude"
+					placeholder="22.123456"
+				/>
+				<div class="field__help">GPS latitude coordinate (decimal)</div>
+			</div>
+
+			<div class="field">
 					<label class="field__label" for="longitude">Longitude</label>
 					<input
 						id="longitude"
-						name="longitude"
+						formControlName="longitude"
 						type="number"
 						step="0.000001"
 						class="field__input"
-						[(ngModel)]="form.longitude"
 						placeholder="114.123456"
 					/>
 					<div class="field__help">GPS longitude coordinate (decimal)</div>
@@ -227,7 +240,7 @@
 			</div>
 
 			<div class="create-post__actions">
-				<button class="btn btn-primary" type="submit" [disabled]="loading()">
+				<button class="btn btn-primary" type="submit" [disabled]="loading() || form.invalid">
 					{{ loading() ? 'Creating…' : 'Create Record' }}
 				</button>
 				<button class="btn btn-secondary" type="button" (click)="reset()" [disabled]="loading()">

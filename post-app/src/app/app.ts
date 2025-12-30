@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { CreatePost } from './create-post/create-post';
 import { SearchPost } from './search-post/search-post';
+import { DeletePost } from './delete-post/delete-post';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, FormsModule, CreatePost, SearchPost],
+  imports: [CommonModule, FormsModule, CreatePost, SearchPost, DeletePost],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -20,7 +21,9 @@ export class App {
   results = signal<any[]>([]);
   showCreateForm = signal(false);
   showSearchForm = signal(false);
+  showDeleteForm = signal(false);
   searchMode = signal('district');
+  selectedRecordForDelete = signal<any>(null);
   
   searchDistrict = '';
   searchDay: number | null = null;
@@ -42,11 +45,27 @@ export class App {
     this.showSearchForm.set(false);
   }
 
+  openDeleteForm() {
+    this.selectedRecordForDelete.set(null);
+    this.showDeleteForm.set(true);
+  }
+
+  closeDeleteForm() {
+    this.showDeleteForm.set(false);
+    this.selectedRecordForDelete.set(null);
+  }
+  
+  // Open delete form with pre-filled data from search
+  openDeleteFormWithData(record: any) {
+    this.selectedRecordForDelete.set(record);
+    this.showDeleteForm.set(true);
+  }
+
   pingServer() {
     this.loading.set(true);
     this.message.set('Pinging server...');
 
-    // Uses Angular dev-server proxy: /mobilepost -> http://localhost:3001/mobilepost
+    // mobilepost -> http://localhost:3001/mobilepost
     this.http.get<any>('/mobilepost').subscribe({
       next: (response) => {
         this.loading.set(false);

@@ -209,6 +209,23 @@
 }
 
 /* Action Buttons */
+.btn-view {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+    margin-right: 0.5rem;
+}
+
+.btn-view:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+}
+
 .btn-edit {
     background: #dbeafe;
     color: #1d4ed8;

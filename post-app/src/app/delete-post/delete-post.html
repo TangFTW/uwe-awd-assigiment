@@ -1,0 +1,317 @@
+<div class="delete-container">
+  <header class="delete-header">
+    <div>
+      <h1>🗑️ Delete Mobile Post Offices</h1>
+      <p>Browse and delete mobile post office records</p>
+    </div>
+    <button class="btn-close" type="button" (click)="close()">Close</button>
+  </header>
+
+  <!-- Search Mode Selector -->
+  <div class="mode-selector">
+    <button [class.active]="searchMode === 'id'" (click)="searchMode = 'id'">
+      🔢 ID
+    </button>
+    <button [class.active]="searchMode === 'district'" (click)="searchMode = 'district'">
+      📍 District
+    </button>
+    <button [class.active]="searchMode === 'location'" (click)="searchMode = 'location'">
+      Location
+    </button>
+    <button [class.active]="searchMode === 'day'" (click)="searchMode = 'day'">
+      Day of Week
+    </button>
+    <button [class.active]="searchMode === 'address'" (click)="searchMode = 'address'">
+      Address
+    </button>
+    <button [class.active]="searchMode === 'mobileCode'" (click)="searchMode = 'mobileCode'">
+      📱 Mobile Code
+    </button>
+  </div>
+
+  <!-- Search Form -->
+  <form class="search-form" (ngSubmit)="onSearch()">
+    <!-- ID Search -->
+    @if (searchMode === 'id') {
+    <div class="form-group">
+      <label for="id">Record ID</label>
+      <input
+        id="id"
+        type="number"
+        [(ngModel)]="idInput"
+        name="id"
+        placeholder="Enter record ID"
+        class="form-input"
+      />
+    </div>
+    }
+
+    <!-- District Search -->
+    @if (searchMode === 'district') {
+    <div class="form-group">
+      <label for="district">District (EN)</label>
+      <input
+        id="district"
+        type="text"
+        [(ngModel)]="districtInput"
+        name="district"
+        placeholder="e.g. Tsuen Wan, Sai Kung"
+        class="form-input"
+      />
+    </div>
+    }
+
+    <!-- Location Search -->
+    @if (searchMode === 'location') {
+    <div class="form-group">
+      <label for="location">Location (EN)</label>
+      <input
+        id="location"
+        type="text"
+        [(ngModel)]="locationInput"
+        name="location"
+        placeholder="e.g. Sham Tseng, Pui O"
+        class="form-input"
+      />
+    </div>
+    }
+
+    <!-- Day of Week Search -->
+    @if (searchMode === 'day') {
+    <div class="form-group">
+      <label for="day">Day of Week (1-7)</label>
+      <input
+        id="day"
+        type="number"
+        [(ngModel)]="dayInput"
+        name="day"
+        min="1"
+        max="7"
+        placeholder="1=Mon, 7=Sun"
+        class="form-input"
+      />
+    </div>
+    }
+
+    <!-- Address Search -->
+    @if (searchMode === 'address') {
+    <div class="form-group">
+      <label for="address">Address (EN)</label>
+      <input
+        id="address"
+        type="text"
+        [(ngModel)]="addressInput"
+        name="address"
+        placeholder="e.g. Castle Peak Road"
+        class="form-input"
+      />
+    </div>
+    }
+
+    <!-- Mobile Code Search -->
+    @if (searchMode === 'mobileCode') {
+    <div class="form-group">
+      <label for="mobileCode">Mobile Code</label>
+      <input
+        id="mobileCode"
+        type="text"
+        [(ngModel)]="mobileCodeInput"
+        name="mobileCode"
+        placeholder="e.g. 1, 2"
+        class="form-input"
+      />
+    </div>
+    }
+
+    <button type="submit" class="btn-search">Browse Records</button>
+  </form>
+
+  <!-- Record Detail Display (shown when single record is selected) -->
+  @if (posts.length === 1 && selectedRecord) {
+  <div class="record-detail-section">
+    <h2>📋 Record Details</h2>
+    <div class="warning-banner">
+      <span>⚠️</span>
+      <p><strong>Warning:</strong> You are about to delete this record. This action cannot be undone.</p>
+    </div>
+
+    <div class="detail-list">
+      <div class="detail-item">
+        <span class="detail-label">Record ID:</span>
+        <span class="detail-value">{{ posts[0].id }}</span>
+      </div>
+      
+      <div class="detail-item">
+        <span class="detail-label">Mobile Code:</span>
+        <span class="detail-value">{{ posts[0].mobileCode }}</span>
+      </div>
+      
+      <div class="detail-item">
+        <span class="detail-label">District:</span>
+        <span class="detail-value">
+          {{ posts[0].districtEN || '—' }}
+          @if (posts[0].districtTC) { / {{ posts[0].districtTC }} }
+          @if (posts[0].districtSC) { / {{ posts[0].districtSC }} }
+        </span>
+      </div>
+      
+      <div class="detail-item">
+        <span class="detail-label">Location:</span>
+        <span class="detail-value">
+          {{ posts[0].locationEN || '—' }}
+          @if (posts[0].locationTC) { / {{ posts[0].locationTC }} }
+          @if (posts[0].locationSC) { / {{ posts[0].locationSC }} }
+        </span>
+      </div>
+      
+      <div class="detail-item">
+        <span class="detail-label">Address:</span>
+        <span class="detail-value">
+          {{ posts[0].addressEN || '—' }}
+          @if (posts[0].addressTC) { <br>{{ posts[0].addressTC }} }
+          @if (posts[0].addressSC) { <br>{{ posts[0].addressSC }} }
+        </span>
+      </div>
+      
+      <div class="detail-item">
+        <span class="detail-label">Day of Week:</span>
+        <span class="detail-value">{{ posts[0].dayOfWeekCode }} ({{ getDayName(posts[0].dayOfWeekCode) }})</span>
+      </div>
+      
+      <div class="detail-item">
+        <span class="detail-label">Operating Hours:</span>
+        <span class="detail-value">{{ posts[0].openHour }} - {{ posts[0].closeHour }}</span>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <button
+        class="btn-delete-confirm"
+        type="button"
+        (click)="showDeleteConfirmation(posts[0])">
+        Delete This Record
+      </button>
+      <button
+        class="btn-cancel"
+        type="button"
+        (click)="clearSelection()">
+        Cancel
+      </button>
+    </div>
+  </div>
+  }
+
+  <!-- Results -->
+  @if (posts.length > 0 && !selectedRecord) {
+  <div class="results-section">
+    <h2>Found {{ posts.length }} records</h2>
+    <div class="warning-banner">
+      <span>⚠️</span>
+      <p><strong>Warning:</strong> Deleting records is permanent and cannot be undone. Please verify before deleting.</p>
+    </div>
+    <div class="table-container">
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Mobile Code</th>
+            <th>District</th>
+            <th>地區</th>
+            <th>地区</th>
+            <th>Location</th>
+            <th>地點</th>
+            <th>地点</th>
+            <th>Address</th>
+            <th>地址</th>
+            <th>地址</th>
+            <th>Day</th>
+            <th>Open</th>
+            <th>Close</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (post of posts; track post.id) {
+          <tr>
+            <td>{{ post.id }}</td>
+            <td>{{ post.mobileCode }}</td>
+            <td>{{ post.districtEN || '—' }}</td>
+            <td>{{ post.districtTC || '—' }}</td>
+            <td>{{ post.districtSC || '—' }}</td>
+            <td>{{ post.locationEN || '—' }}</td>
+            <td>{{ post.locationTC || '—' }}</td>
+            <td>{{ post.locationSC || '—' }}</td>
+            <td>{{ post.addressEN || '—' }}</td>
+            <td>{{ post.addressTC || '—' }}</td>
+            <td>{{ post.addressSC || '—' }}</td>
+            <td>{{ post.dayOfWeekCode }}</td>
+            <td>{{ post.openHour }}</td>
+            <td>{{ post.closeHour }}</td>
+            <td>
+              <button
+                class="btn-delete"
+                (click)="onDelete(post.id, post.districtEN + ' - ' + post.locationEN)">
+                🗑️ Delete
+              </button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+  } @else if (posts.length === 0 && searched) {
+  <div class="no-results">
+    <p>No records found. Try different search criteria.</p>
+  </div>
+  }
+</div>
+
+<!-- Confirmation Modal -->
+@if (showConfirmModal && recordToDelete) {
+<div class="modal-backdrop" (click)="cancelDelete()">
+  <div class="confirmation-modal" (click)="$event.stopPropagation()">
+    <div class="confirmation-header">
+      <h2>Delete Confirmation</h2>
+    </div>
+    <div class="confirmation-body">
+      <p class="warning-text">Are you sure you want to delete this record?</p>
+      <p class="irreversible-warning">⚠️ THIS ACTION IS IRREVERSIBLE ⚠️</p>
+      
+      <div class="record-preview">
+        <div class="preview-item">
+          <strong>ID:</strong> {{ recordToDelete.id }}
+        </div>
+        <div class="preview-item">
+          <strong>Mobile Code:</strong> {{ recordToDelete.mobileCode }}
+        </div>
+        <div class="preview-item">
+          <strong>Location:</strong> {{ recordToDelete.nameEN || recordToDelete.locationEN || '—' }}
+        </div>
+        <div class="preview-item">
+          <strong>District:</strong> {{ recordToDelete.districtEN || '—' }}
+        </div>
+        @if (recordToDelete.dayOfWeekCode) {
+        <div class="preview-item">
+          <strong>Day of Week:</strong> {{ getDayName(recordToDelete.dayOfWeekCode) }}
+        </div>
+        }
+        @if (recordToDelete.addressEN) {
+        <div class="preview-item">
+          <strong>Address:</strong> {{ recordToDelete.addressEN }}
+        </div>
+        }
+        @if (recordToDelete.openHour && recordToDelete.closeHour) {
+        <div class="preview-item">
+          <strong>Operating Hours:</strong> {{ recordToDelete.openHour }} - {{ recordToDelete.closeHour }}
+        </div>
+        }
+      </div>
+    </div>
+    <div class="confirmation-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">Cancel</button>
+      <button class="btn-confirm-delete" (click)="confirmDelete()">Confirm Delete</button>
+    </div>
+  </div>
+</div>
+}

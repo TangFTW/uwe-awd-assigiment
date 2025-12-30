@@ -202,14 +202,21 @@
 					required
 				/>
 				<div class="field__help">Format: HH:MM:SS</div>
-						type="number"
-						step="0.000001"
-						class="field__input"
-						[(ngModel)]="form.latitude"
-						placeholder="22.123456"
-					/>
-					<div class="field__help">GPS latitude coordinate (decimal)</div>
-				</div>
+			</div>
+
+			<div class="field">
+				<label class="field__label" for="latitude">Latitude</label>
+				<input
+					id="latitude"
+					name="latitude"
+					type="number"
+					step="0.000001"
+					class="field__input"
+					[(ngModel)]="form.latitude"
+					placeholder="22.123456"
+				/>
+				<div class="field__help">GPS latitude coordinate (decimal)</div>
+			</div>
 
 				<div class="field">
 					<label class="field__label" for="longitude">Longitude</label>

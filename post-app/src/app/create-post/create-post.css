@@ -101,6 +101,22 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+.field__input--error {
+  border-color: #dc2626;
+}
+
+.field__input--error:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.field__error {
+  color: #dc2626;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
 .field__input::placeholder {
   color: #9ca3af;
 }

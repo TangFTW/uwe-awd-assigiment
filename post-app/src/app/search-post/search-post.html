@@ -1,7 +1,7 @@
 <div class="search-container">
   <header class="search-header">
     <div>
-      <h1>🔍 Search Mobile Post Offices</h1>
+      <h1>Search Mobile Post Offices</h1>
       <p>Find mobile post offices across Hong Kong</p>
     </div>
     <button class="btn-close" type="button" (click)="close()">Close</button>
@@ -10,21 +10,24 @@
   <!-- Search Mode Selector -->
   <div class="mode-selector">
     <button [class.active]="searchMode === 'district'" (click)="searchMode = 'district'">
-      📍 District
+      District
     </button>
     <button [class.active]="searchMode === 'day'" (click)="searchMode = 'day'">
-      📅 Day of Week
+      Day of Week
     </button>
     <button [class.active]="searchMode === 'location'" (click)="searchMode = 'location'">
-      🏢 Location
+      Location
     </button>
     <button [class.active]="searchMode === 'address'" (click)="searchMode = 'address'">
-      🗺️ Address
+      Address
+    </button>
+    <button [class.active]="searchMode === 'advanced'" (click)="searchMode = 'advanced'">
+      Advanced Search
     </button>
   </div>
 
   <!-- Search Form -->
-  <form class="search-form" (ngSubmit)="onSearch()">
+  <form class="search-form" [formGroup]="searchForm" (ngSubmit)="onSearch()">
     <!-- District Search -->
     @if (searchMode === 'district') {
     <div class="form-group">
@@ -32,8 +35,7 @@
       <input
         id="district"
         type="text"
-        [(ngModel)]="districtInput"
-        name="district"
+        formControlName="districtInput"
         placeholder="e.g. Tsuen Wan, Sai Kung"
         class="form-input"
       />
@@ -47,8 +49,7 @@
       <input
         id="day"
         type="number"
-        [(ngModel)]="dayInput"
-        name="day"
+        formControlName="dayInput"
         min="1"
         max="7"
         placeholder="1=Mon, 7=Sun"
@@ -64,8 +65,7 @@
       <input
         id="location"
         type="text"
-        [(ngModel)]="locationInput"
-        name="location"
+        formControlName="locationInput"
         placeholder="e.g. Sham Tseng, Pui O"
         class="form-input"
       />
@@ -79,18 +79,85 @@
       <input
         id="address"
         type="text"
-        [(ngModel)]="addressInput"
-        name="address"
+        formControlName="addressInput"
         placeholder="e.g. Castle Peak Road"
         class="form-input"
       />
     </div>
     }
 
-    <button type="submit" class="btn-search">🔍 Search</button>
+    <!-- Advanced Search -->
+    @if (searchMode === 'advanced') {
+    <div class="form-group">
+      <label for="advDistrict">District (EN)</label>
+      <input
+        id="advDistrict"
+        type="text"
+        formControlName="districtInput"
+        name="advDistrict"
+        placeholder="e.g. Tsuen Wan"
+        class="form-input"
+      />
+    </div>
+    <div class="form-group">
+      <label for="advLocation">Location (EN)</label>
+      <input
+        id="advLocation"
+        type="text"
+        formControlName="locationInput"
+        placeholder="e.g. Sham Tseng"
+        class="form-input"
+      />
+    </div>
+    <div class="form-group">
+      <label for="advAddress">Address (EN)</label>
+      <input
+        id="advAddress"
+        type="text"
+        formControlName="addressInput"
+        placeholder="e.g. Castle Peak Road"
+        class="form-input"
+      />
+    </div>
+    <div class="form-group">
+      <label for="advDay">Day of Week (1-7, optional)</label>
+      <input
+        id="advDay"
+        type="number"
+        formControlName="dayInput"
+        min="1"
+        max="7"
+        placeholder="1=Mon, 7=Sun"
+        class="form-input"
+      />
+    </div>
+    <div class="form-group">
+      <label for="advMobileCode">Mobile Code (optional)</label>
+      <input
+        id="advMobileCode"
+        type="text"
+        formControlName="mobileCodeInput"
+        placeholder="e.g. 1, 2"
+        class="form-input"
+      />
+    </div>
+    <div class="form-group">
+      <label for="advOpenAt">Open at Time (HH:MM, optional)</label>
+      <input
+        id="advOpenAt"
+        type="text"
+        formControlName="openAtInput"
+        placeholder="e.g. 09:00, 14:30"
+        class="form-input"
+      />
+      <small style="color: #6b7280; font-size: 0.85em;">Find posts open at this specific time</small>
+    </div>
+    }
+
+    <button type="submit" class="btn-search">Search</button>
   </form>
 
-  <!-- Results Table -->
+  <!-- Results -->
   @if (posts.length > 0) {
   <div class="results-section">
     <h2>Found {{ posts.length }} records</h2>
@@ -133,8 +200,8 @@
             <td>{{ post.openHour }}</td>
             <td>{{ post.closeHour }}</td>
             <td>
-              <button class="btn-edit" (click)="onEdit(post)">✏️ Edit</button>
-              <button class="btn-delete" (click)="onDelete(post.id)">🗑️</button>
+              <button class="btn-view" (click)="onView(post)" title="View Details">View</button>
+              <button class="btn-edit" (click)="onEdit(post)" title="Edit">Edit</button>
             </td>
           </tr>
           }
@@ -149,12 +216,26 @@
   }
 </div>
 
+<!-- View Post Modal -->
+@if (showViewModal() && selectedPost()) {
+<div class="modal-overlay" (click)="closeViewModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <app-view-post
+      [record]="selectedPost()!"
+      (closeModal)="closeViewModal()"
+      (editRecord)="onEditFromView($event)"
+      (deleteRecord)="onDeleteFromView($event)"
+    ></app-view-post>
+  </div>
+</div>
+}
+
 <!-- Update Post Modal -->
-@if (showUpdateModal()) {
+@if (showUpdateModal() && selectedPost()) {
 <div class="modal-overlay" (click)="closeUpdateModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <app-update-post
-      [postData]="selectedPost()"
+      [postData]="selectedPost()!"
       (closeModal)="closeUpdateModal()"
     ></app-update-post>
   </div>

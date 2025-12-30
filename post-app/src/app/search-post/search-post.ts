@@ -1,18 +1,20 @@
 import { Component, OnInit, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { HttpClient, HttpClientModule, HttpParams } from '@angular/common/http';
 import { UpdatePost } from '../update-post/update-post';
+import { ViewPost } from '../view-post/view-post';
 
 @Component({
   selector: 'app-search-post',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, UpdatePost],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, UpdatePost, ViewPost],
   templateUrl: './search-post.html',
   styleUrls: ['./search-post.css']
 })
 export class SearchPost implements OnInit {
   private http = inject(HttpClient);
+  private fb = inject(FormBuilder);
   
   // Input from parent to set initial search mode
   initialMode = input<string>('district');
@@ -20,19 +22,20 @@ export class SearchPost implements OnInit {
   // Output event to close modal
   closeModal = output();
   
+  // Output event to open delete form with pre-filled data
+  openDeleteWithData = output<any>();
+  
   // Data for the Table
   posts: any[] = [];
   searched: boolean = false;
   
-  // Update modal state
+  // Modal states
+  showViewModal = signal(false);
   showUpdateModal = signal(false);
   selectedPost = signal<any>(null);
   
-  // Search Inputs
-  districtInput: string = '';
-  locationInput: string = '';
-  dayInput: number | null = null;
-  addressInput: string = '';
+  // Reactive Form
+  searchForm!: FormGroup;
   
   // Current search mode
   searchMode: string = 'district';
@@ -40,6 +43,16 @@ export class SearchPost implements OnInit {
   ngOnInit() {
     // Set initial search mode from parent
     this.searchMode = this.initialMode();
+    
+    // Initialize reactive form
+    this.searchForm = this.fb.group({
+      districtInput: [''],
+      locationInput: [''],
+      dayInput: [null],
+      addressInput: [''],
+      mobileCodeInput: [''],
+      openAtInput: ['']
+    });
   }
 
   close() {
@@ -50,18 +63,42 @@ export class SearchPost implements OnInit {
   onSearch() {
     let params = new HttpParams();
     
-    // Add params based on search mode
-    if (this.searchMode === 'district' && this.districtInput) {
-      params = params.set('districtEN', this.districtInput);
-    }
-    if (this.searchMode === 'location' && this.locationInput) {
-      params = params.set('locationEN', this.locationInput);
-    }
-    if (this.searchMode === 'day' && this.dayInput) {
-      params = params.set('dayOfWeekCode', this.dayInput.toString());
-    }
-    if (this.searchMode === 'address' && this.addressInput) {
-      params = params.set('addressEN', this.addressInput);
+    const formValues = this.searchForm.value;
+    
+    // For advanced search, add all filled fields
+    if (this.searchMode === 'advanced') {
+      if (formValues.districtInput) {
+        params = params.set('districtEN', formValues.districtInput);
+      }
+      if (formValues.locationInput) {
+        params = params.set('locationEN', formValues.locationInput);
+      }
+      if (formValues.addressInput) {
+        params = params.set('addressEN', formValues.addressInput);
+      }
+      if (formValues.dayInput) {
+        params = params.set('dayOfWeekCode', formValues.dayInput.toString());
+      }
+      if (formValues.mobileCodeInput) {
+        params = params.set('mobileCode', formValues.mobileCodeInput);
+      }
+      if (formValues.openAtInput) {
+        params = params.set('openAt', formValues.openAtInput);
+      }
+    } else {
+      // Single-field search modes
+      if (this.searchMode === 'district' && formValues.districtInput) {
+        params = params.set('districtEN', formValues.districtInput);
+      }
+      if (this.searchMode === 'location' && formValues.locationInput) {
+        params = params.set('locationEN', formValues.locationInput);
+      }
+      if (this.searchMode === 'day' && formValues.dayInput) {
+        params = params.set('dayOfWeekCode', formValues.dayInput.toString());
+      }
+      if (this.searchMode === 'address' && formValues.addressInput) {
+        params = params.set('addressEN', formValues.addressInput);
+      }
     }
 
     // Call your Server (use proxy)
@@ -80,26 +117,39 @@ export class SearchPost implements OnInit {
       });
   }
   
-  // Delete Function
-  onDelete(id: number) {
-    if (!confirm(`Are you sure you want to delete record ID ${id}?`)) {
-      return;
-    }
-
-    this.http.delete<any>(`/mobilepost/${id}`)
-      .subscribe({
-        next: (response) => {
-          if (response.success) {
-            alert('Record deleted successfully!');
-            // Remove from current results
-            this.posts = this.posts.filter(p => p.id !== id);
-          }
-        },
-        error: (err) => {
-          console.error('Delete failed', err);
-          alert(err?.error?.errmsg || 'Failed to delete record');
-        }
-      });
+  // Delete Function - redirect to delete form with data
+  onDeleteRedirect(post: any) {
+    // Emit the post data to parent component
+    this.openDeleteWithData.emit(post);
+    // Close the search modal
+    this.closeModal.emit();
+  }
+  
+  // View Function
+  onView(post: any) {
+    this.selectedPost.set(post);
+    this.showViewModal.set(true);
+  }
+  
+  // Close View Modal
+  closeViewModal() {
+    this.showViewModal.set(false);
+    this.selectedPost.set(null);
+  }
+  
+  // Edit from View Modal
+  onEditFromView(post: any) {
+    this.showViewModal.set(false);
+    this.selectedPost.set(post);
+    this.showUpdateModal.set(true);
+  }
+  
+  // Delete from View Modal
+  onDeleteFromView(post: any) {
+    this.showViewModal.set(false);
+    // Redirect to parent's delete component
+    this.openDeleteWithData.emit(post);
+    this.closeModal.emit();
   }
   
   // Edit Function

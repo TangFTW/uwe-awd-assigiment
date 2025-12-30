@@ -2,14 +2,14 @@
 <!-- Hero -->
 <section class="hero-section">
   <div class="hero-content">
-    <h1>🏤 Hong Kong Mobile Post Office Finder</h1>
+    <h1>Hong Kong Mobile Post Office Finder</h1>
     <p class="tagline">
       Search, manage, and locate mobile post offices across Hong Kong
     </p>
 
     <div class="action-buttons">
-      <button class="btn btn-primary" (click)="openCreateForm()">➕ Create New Record</button>
-      <a class="btn btn-secondary">Browse/Update Records(Admin Only)</a>
+      <button class="btn btn-primary" (click)="openCreateForm()">Create New Record</button>
+      <button class="btn btn-secondary" (click)="openDeleteForm()">Browse/Delete Records (Admin Only)</button>
     </div>
   </div>
 </section>
@@ -23,28 +23,28 @@
 
   <div class="search-grid">
     <article class="search-card">
-      <div class="card-icon">📍</div>
+      <div class="card-icon"></div>
       <h3>By District</h3>
       <p>Search for mobile post offices in specific districts.</p>
       <a class="card-link" (click)="openSearchForm('district')">Search by District →</a>
     </article>
 
     <article class="search-card">
-      <div class="card-icon">📅</div>
+      <div class="card-icon"></div>
       <h3>By Day of Week</h3>
       <p>Find which offices operate on specific days.</p>
       <a class="card-link" (click)="openSearchForm('day')">Search by Day →</a>
     </article>
 
     <article class="search-card">
-      <div class="card-icon">🏢</div>
+      <div class="card-icon"></div>
       <h3>By Location</h3>
-      <p>Search by location name or area (locationEN).</p>
+      <p>Search by location name or area.</p>
       <a class="card-link" (click)="openSearchForm('location')">Search by Location →</a>
     </article>
 
     <article class="search-card">
-      <div class="card-icon">🗺️</div>
+      <div class="card-icon"></div>
       <h3>By Address</h3>
       <p>Find mobile post offices by street address.</p>
       <a class="card-link" (click)="openSearchForm('address')">Search by Address →</a>
@@ -76,7 +76,21 @@
 @if (showSearchForm()) {
   <div class="modal-overlay" (click)="closeSearchForm()">
     <div class="modal-content" (click)="$event.stopPropagation()">
-      <app-search-post [initialMode]="searchMode()" (closeModal)="closeSearchForm()"></app-search-post>
+      <app-search-post 
+        [initialMode]="searchMode()" 
+        (closeModal)="closeSearchForm()"
+        (openDeleteWithData)="openDeleteFormWithData($event)"></app-search-post>
+    </div>
+  </div>
+}
+
+<!-- Delete Post Modal -->
+@if (showDeleteForm()) {
+  <div class="modal-overlay" (click)="closeDeleteForm()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <app-delete-post 
+        [prefilledRecord]="selectedRecordForDelete()" 
+        (closeModal)="closeDeleteForm()"></app-delete-post>
     </div>
   </div>
 }
