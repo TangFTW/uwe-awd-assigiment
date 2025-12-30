@@ -25,6 +25,7 @@ const ERROR_CODES = {
   INVALID_DAY_OF_WEEK: { code: '0101', message: 'dayOfWeekCode must be between 1 and 7' },
   INVALID_TIME_FORMAT: { code: '0102', message: 'Invalid time format (use HH:MM)' },
   INVALID_FIELD: { code: '0103', message: 'Invalid or disallowed field' },
+  INVALID_DATA: { code: '0104', message: 'Invalid data format' },
   
   // Missing/Required Field Errors (02xx)
   MISSING_REQUIRED_FIELDS: { code: '0200', message: 'Missing required fields' },
