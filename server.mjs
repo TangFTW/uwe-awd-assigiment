@@ -4,7 +4,7 @@ import mysql from 'mysql2/promise';
 const server = express();
 server.use(express.json());
 
-// Create a connection pool
+// Create a connection pool to database
 const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
@@ -14,7 +14,7 @@ const pool = mysql.createPool({
   charset: 'utf8mb4_general_ci'
 });
 
-// error index
+// error list
 // 01xx - Validation Errors
 // 02xx - Missing/Required Field Errors
 // 03xx - Search/Query Errors
@@ -68,28 +68,9 @@ function isNonEmptyString(v) {
   return typeof v === 'string' && v.trim().length > 0;
 }
 
-
-server.get('/', async (_req, res) => {
-  console.log('Welcome to the HKPO Mobile Post API');
-  try {
-    const [rows] = await pool.query('SELECT * FROM mobilepost');
-    res.json({
-      success: true,
-      message: 'Hello World',
-      count: rows.length,
-      data: rows
-    });
-  } catch (err) {
-    console.error('SQL execution error:', err);
-    const errorResponse = createErrorResponse(ERROR_CODES.SQL_EXECUTION_ERROR, err.message);
-    console.log('Error response:', errorResponse);
-    res.status(500).json(errorResponse);
-  }
-});
-
 // Shared search handler
 async function handleMobilepostSearch(req, res) {
-  const { districtEN, dayOfWeekCode, mobileCode, openAt, addressEN, locationEN, addressTC, addressSC, addressZH } = req.query;
+  const { id, districtEN, dayOfWeekCode, mobileCode, openAt, addressEN, locationEN, addressTC, addressSC, addressZH } = req.query;
   
   // Validate that if string params are provided, they must not be empty
   const stringParams = { districtEN, mobileCode, addressEN, locationEN, addressTC, addressSC, addressZH };
@@ -104,14 +85,28 @@ async function handleMobilepostSearch(req, res) {
     }
   }
   
-  if (isNonEmptyString(districtEN)) {
+  if (id !== undefined) {
+    console.log('Get record by ID', id);
+  } else if (isNonEmptyString(districtEN)) {
     console.log('Get records by district', districtEN);
   } else {
-    console.log( 'Search mobilepost', req.query);
+    console.log('Search mobilepost', req.query);
   }
   const where = [];
   const params = [];
 
+  // Search by ID
+  if (id !== undefined) {
+    const recordId = Number(id);
+    if (!Number.isInteger(recordId) || recordId <= 0) {
+      const errorResponse = createErrorResponse(ERROR_CODES.INVALID_ID);
+      console.log('Error response:', errorResponse);
+      return res.status(400).json(errorResponse);
+    }
+    where.push('id = ?');
+    params.push(recordId);
+  }
+  
   if (isNonEmptyString(districtEN)) {
     where.push('districtEN = ?');
     params.push(districtEN);
@@ -164,7 +159,7 @@ async function handleMobilepostSearch(req, res) {
   }
 
   const sql = `
-    SELECT id, mobileCode, nameEN, nameTC, nameSC,
+    SELECT id, mobileCode, seq, nameEN, nameTC, nameSC,
            districtEN, districtTC, districtSC,
            locationEN, locationTC, locationSC,
            addressEN, addressTC, addressSC,
@@ -478,6 +473,6 @@ server.delete('/mobilepost/:id', async (req, res) => {
 
 // Start server
 server.listen(3001, () => {
-  console.log('Server started.');
+  console.log('Server started at 3001, welcome to the HKPO Mobile Post API');
 });
 
