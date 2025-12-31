@@ -45,8 +45,8 @@ export class CreatePost implements OnInit {
       addressEN: ['', [Validators.required, Validators.minLength(5)]],
       addressTC: [''],
       addressSC: [''],
-      openHour: ['', [Validators.required, Validators.pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/)]],
-      closeHour: ['', [Validators.required, Validators.pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/)]],
+      openHour: ['', [Validators.required, Validators.pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)]],
+      closeHour: ['', [Validators.required, Validators.pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)]],
       latitude: [null, [Validators.min(-90), Validators.max(90)]],
       longitude: [null, [Validators.min(-180), Validators.max(180)]]
     });
@@ -78,7 +78,7 @@ export class CreatePost implements OnInit {
     if (field.errors['minlength']) return `Minimum length is ${field.errors['minlength'].requiredLength}`;
     if (field.errors['min']) return `Minimum value is ${field.errors['min'].min}`;
     if (field.errors['max']) return `Maximum value is ${field.errors['max'].max}`;
-    if (field.errors['pattern']) return 'Invalid format (use HH:MM:SS)';
+    if (field.errors['pattern']) return 'Invalid format (use HH:MM)';
     
     return 'Invalid value';
   }
@@ -99,8 +99,17 @@ export class CreatePost implements OnInit {
 
     this.loading.set(true);
 
+    // Prepare data and trim time format from HH:MM:SS to HH:MM
+    const formData = { ...this.form.value };
+    if (formData.openHour && formData.openHour.length > 5) {
+      formData.openHour = formData.openHour.substring(0, 5);
+    }
+    if (formData.closeHour && formData.closeHour.length > 5) {
+      formData.closeHour = formData.closeHour.substring(0, 5);
+    }
+
     // Call POST /mobilepost
-    this.http.post<any>('/mobilepost', this.form.value).subscribe({
+    this.http.post<any>('/mobilepost', formData).subscribe({
       next: (response) => {
         this.loading.set(false);
         if (response.success) {

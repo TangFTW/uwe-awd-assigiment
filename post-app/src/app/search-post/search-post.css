@@ -10,7 +10,7 @@
 
 /* Header */
 .search-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #00833E 0%, #006823 100%);
     color: white;
     padding: 2rem;
     display: flex;
@@ -29,19 +29,20 @@
 }
 
 .btn-close {
-    background: rgba(255,255,255,0.2);
+    background: transparent;
     color: white;
-    border: none;
+    border: 1px solid rgba(255,255,255,0.3);
     padding: 0.625rem 1.25rem;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
     transition: all 0.2s;
+    opacity: 0.7;
 }
 
 .btn-close:hover {
-    background: rgba(255,255,255,0.3);
-    transform: translateY(-2px);
+    opacity: 1;
+    border-color: rgba(255,255,255,0.6);
 }
 
 /* Mode Selector */
@@ -65,12 +66,12 @@
 }
 
 .mode-selector button:hover {
-    border-color: #667eea;
+    border-color: #00833E;
     transform: translateY(-2px);
 }
 
 .mode-selector button.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #00833E 0%, #006823 100%);
     color: white;
     border-color: transparent;
 }
@@ -103,14 +104,14 @@
 
 .form-input:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #00833E;
+    box-shadow: 0 0 0 3px rgba(0, 131, 62, 0.1);
 }
 
 .btn-search {
     width: 100%;
     padding: 0.875rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #00833E 0%, #006823 100%);
     color: white;
     border: none;
     border-radius: 8px;
@@ -122,7 +123,7 @@
 
 .btn-search:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 131, 62, 0.3);
 }
 
 /* Results Section */
@@ -151,7 +152,7 @@
 }
 
 .results-table thead {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #00833E 0%, #006823 100%);
     color: white;
     position: sticky;
     top: 0;
@@ -205,12 +206,12 @@
 }
 
 .results-table thead th:last-child {
-    background: #764ba2;
+    background: #006823;
 }
 
 /* Action Buttons */
 .btn-view {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #00833E 0%, #006823 100%);
     color: white;
     border: none;
     padding: 0.5rem 0.75rem;
@@ -223,7 +224,7 @@
 
 .btn-view:hover {
     transform: scale(1.1);
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 2px 8px rgba(0, 131, 62, 0.4);
 }
 
 .btn-edit {

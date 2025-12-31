@@ -185,14 +185,14 @@
 						formControlName="openHour"
 						class="field__input"
 						[class.field__input--error]="hasError('openHour')"
-					placeholder="09:00:00"
+					placeholder="09:00"
 					inputmode="numeric"
 					autocomplete="off"
 				/>
 				@if (hasError('openHour')) {
 					<div class="field__error">{{ getErrorMessage('openHour') }}</div>
 				}
-				<div class="field__help">Format: HH:MM:SS</div>
+				<div class="field__help">Format: HH:MM</div>
 			</div>
 
 			<div class="field">
@@ -202,14 +202,14 @@
 					formControlName="closeHour"
 					class="field__input"
 					[class.field__input--error]="hasError('closeHour')"
-					placeholder="17:00:00"
+					placeholder="17:00"
 					inputmode="numeric"
 					autocomplete="off"
 				/>
 				@if (hasError('closeHour')) {
 					<div class="field__error">{{ getErrorMessage('closeHour') }}</div>
 				}
-				<div class="field__help">Format: HH:MM:SS</div>
+				<div class="field__help">Format: HH:MM</div>
 			</div>
 
 			<div class="field">

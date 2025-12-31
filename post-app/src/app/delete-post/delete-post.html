@@ -1,7 +1,7 @@
 <div class="delete-container">
   <header class="delete-header">
     <div>
-      <h1>🗑️ Delete Mobile Post Offices</h1>
+      <h1>Delete Mobile Post Offices</h1>
       <p>Browse and delete mobile post office records</p>
     </div>
     <button class="btn-close" type="button" (click)="close()">Close</button>
@@ -10,10 +10,10 @@
   <!-- Search Mode Selector -->
   <div class="mode-selector">
     <button [class.active]="searchMode === 'id'" (click)="searchMode = 'id'">
-      🔢 ID
+      ID
     </button>
     <button [class.active]="searchMode === 'district'" (click)="searchMode = 'district'">
-      📍 District
+      District
     </button>
     <button [class.active]="searchMode === 'location'" (click)="searchMode = 'location'">
       Location
@@ -25,7 +25,7 @@
       Address
     </button>
     <button [class.active]="searchMode === 'mobileCode'" (click)="searchMode = 'mobileCode'">
-      📱 Mobile Code
+      Mobile Code
     </button>
   </div>
 
@@ -129,7 +129,7 @@
   <!-- Record Detail Display (shown when single record is selected) -->
   @if (posts.length === 1 && selectedRecord) {
   <div class="record-detail-section">
-    <h2>📋 Record Details</h2>
+    <h2>Record Details</h2>
     <div class="warning-banner">
       <span>⚠️</span>
       <p><strong>Warning:</strong> You are about to delete this record. This action cannot be undone.</p>
@@ -251,7 +251,7 @@
               <button
                 class="btn-delete"
                 (click)="onDelete(post.id, post.districtEN + ' - ' + post.locationEN)">
-                🗑️ Delete
+                Delete
               </button>
             </td>
           </tr>

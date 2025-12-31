@@ -66,7 +66,16 @@ export class UpdatePost implements OnInit {
 
     this.loading = true;
     
-    this.http.put<any>(`/mobilepost/${post.id}`, this.form)
+    // Prepare data and trim time format from HH:MM:SS to HH:MM
+    const formData = { ...this.form };
+    if (formData.openHour && formData.openHour.length > 5) {
+      formData.openHour = formData.openHour.substring(0, 5);
+    }
+    if (formData.closeHour && formData.closeHour.length > 5) {
+      formData.closeHour = formData.closeHour.substring(0, 5);
+    }
+    
+    this.http.put<any>(`/mobilepost/${post.id}`, formData)
       .subscribe({
         next: (response) => {
           this.loading = false;

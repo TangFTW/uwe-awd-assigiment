@@ -31,10 +31,9 @@ export class DeletePost implements OnInit {
   mobileCodeInput: string = '';
   idInput: number | null = null;
 
-  // Current search mode
   searchMode: string = 'id';
 
-  // Confirmation modal state
+
   showConfirmModal: boolean = false;
   recordToDelete: any = null;
 
@@ -112,7 +111,7 @@ export class DeletePost implements OnInit {
       params = params.set('mobileCode', this.mobileCodeInput);
     }
 
-    // Call your Server (use proxy)
+    
     this.http.get<any>('/mobilepost', { params })
       .subscribe({
         next: (response) => {
@@ -155,12 +154,18 @@ export class DeletePost implements OnInit {
       .subscribe({
         next: (response) => {
           if (response.success) {
+            // Close confirmation modal first
+            this.showConfirmModal = false;
+            this.recordToDelete = null;
+            
             alert('Record deleted successfully!');
+            
             // Remove from current results
             this.posts = this.posts.filter(p => p.id !== id);
             this.selectedRecord = null;
-            this.showConfirmModal = false;
-            this.recordToDelete = null;
+            
+            // Close the main delete window
+            this.close();
           }
         },
         error: (err) => {

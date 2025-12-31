@@ -16,3 +16,51 @@ body {
   color-scheme: light;
   margin: 0;
 }
+
+.hk-navbar {
+  background-color: #00833E; /* Hardcoded HK Post Green for safety */
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  font-family: Roboto, sans-serif;
+}
+
+.hk-navbar a {
+  color: white;
+  text-decoration: none;
+  margin-left: 1.5rem;
+  font-size: 1rem;
+  padding-bottom: 4px;
+}
+
+.hk-navbar a:hover {
+  text-decoration: underline;
+}
+
+.hk-navbar a.active {
+  font-weight: bold;
+  border-bottom: 2px solid white;
+}
+
+.content-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.hk-footer {
+  background-color: #f5f5f5;
+  padding: 2rem;
+  margin-top: 4rem;
+  border-top: 1px solid #ddd;
+  text-align: center;
+  color: #555;
+  
+  h3 {
+    color: #00833E; /* HK Green */
+    margin-bottom: 0.5rem;
+  }
+}
