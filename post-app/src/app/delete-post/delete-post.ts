@@ -58,7 +58,7 @@ export class DeletePost implements OnInit {
     }
   }
 
-  // Load prefilled record into the search form and automatically search
+  // Load prefilled record into search results
   loadPrefilledRecord(record: any) {
     // Set the record in posts array for immediate display
     this.posts = [record];
@@ -74,7 +74,7 @@ export class DeletePost implements OnInit {
     this.closeModal.emit();
   }
 
-  // Clear the prefilled selection and reset the form
+  // reset the form
   clearSelection() {
     this.posts = [];
     this.searched = false;
@@ -87,7 +87,7 @@ export class DeletePost implements OnInit {
     this.mobileCodeInput = '';
   }
 
-  // The Search Function
+  
   onSearch() {
     let params = new HttpParams();
 
@@ -127,7 +127,7 @@ export class DeletePost implements OnInit {
       });
   }
 
-  // Helper to get day name from code
+  // get day name from code
   getDayName(dayCode: number): string {
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     return days[dayCode - 1] || 'Unknown';
