@@ -66,6 +66,7 @@ function isNonEmptyString(v) {
 
 // Shared search handler
 async function handleMobilepostSearch(req, res) {
+  console.log('GET /mobilepost/search - Processing query:', req.query);
   const { id, districtEN, dayOfWeekCode, mobileCode, openAt, addressEN, locationEN, addressTC, addressSC, addressZH } = req.query;
   
   // Validate that if string params are provided, they must not be empty
