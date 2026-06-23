@@ -1,0 +1,33 @@
+.table-scroll {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.compact-table {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 2400px;
+}
+
+.compact-table th,
+.compact-table td {
+  width: 170px;
+  padding: 8px 10px;
+  font-size: 13px;
+  vertical-align: top;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Make sure Actions column and buttons are fully visible */
+.compact-table th:last-child,
+.compact-table td:last-child {
+  width: 260px;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.compact-table td:last-child button {
+  margin-right: 6px;
+}

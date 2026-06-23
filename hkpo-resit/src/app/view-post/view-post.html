@@ -1,0 +1,105 @@
+<div class="ui raised segment">
+  <h2 class="ui header">View Post Office Record</h2>
+
+  <div class="ui form">
+    <div class="two fields">
+      <div class="field">
+        <label>ID</label>
+        <input type="text" [value]="data.id" readonly>
+      </div>
+      <div class="field">
+        <label>Mobile Code</label>
+        <input type="text" [value]="data.mobileCode" readonly>
+      </div>
+    </div>
+
+    <div class="two fields">
+      <div class="field">
+        <label>Day of Week Code</label>
+        <input type="text" [value]="data.dayOfWeekCode" readonly>
+      </div>
+      <div class="field">
+        <label>Seq</label>
+        <input type="text" [value]="data.seq" readonly>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Name (EN)</label>
+      <input type="text" [value]="data.nameEN" readonly>
+    </div>
+    <div class="field">
+      <label>District (EN)</label>
+      <input type="text" [value]="data.districtEN" readonly>
+    </div>
+    <div class="field">
+      <label>Location (EN)</label>
+      <input type="text" [value]="data.locationEN" readonly>
+    </div>
+    <div class="field">
+      <label>Address (EN)</label>
+      <input type="text" [value]="data.addressEN" readonly>
+    </div>
+
+    <div class="field">
+      <label>Name (TC)</label>
+      <input type="text" [value]="data.nameTC" readonly>
+    </div>
+    <div class="field">
+      <label>District (TC)</label>
+      <input type="text" [value]="data.districtTC" readonly>
+    </div>
+    <div class="field">
+      <label>Location (TC)</label>
+      <input type="text" [value]="data.locationTC" readonly>
+    </div>
+    <div class="field">
+      <label>Address (TC)</label>
+      <input type="text" [value]="data.addressTC" readonly>
+    </div>
+
+    <div class="field">
+      <label>Name (SC)</label>
+      <input type="text" [value]="data.nameSC" readonly>
+    </div>
+    <div class="field">
+      <label>District (SC)</label>
+      <input type="text" [value]="data.districtSC" readonly>
+    </div>
+    <div class="field">
+      <label>Location (SC)</label>
+      <input type="text" [value]="data.locationSC" readonly>
+    </div>
+    <div class="field">
+      <label>Address (SC)</label>
+      <input type="text" [value]="data.addressSC" readonly>
+    </div>
+
+    <div class="two fields">
+      <div class="field">
+        <label>Open Hour</label>
+        <input type="text" [value]="data.openHour" readonly>
+      </div>
+      <div class="field">
+        <label>Close Hour</label>
+        <input type="text" [value]="data.closeHour" readonly>
+      </div>
+    </div>
+
+    <div class="two fields">
+      <div class="field">
+        <label>Latitude</label>
+        <input type="text" [value]="data.latitude" readonly>
+      </div>
+      <div class="field">
+        <label>Longitude</label>
+        <input type="text" [value]="data.longitude" readonly>
+      </div>
+    </div>
+  </div>
+
+  <div class="ui horizontal divider">
+    <button class="ui button" (click)="closeModal()">Close</button>
+  </div>
+</div>
+

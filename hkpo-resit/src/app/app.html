@@ -1,0 +1,30 @@
+<div class="ui container">
+
+  <div class="ui green inverted menu">
+    <div class="header item">HKPO Mobile Post Office</div>
+
+<!-- open create model to let users create a record.-->
+    <button class="ui green button" (click)="openCreateDialog()">
+      Create a record
+    </button>
+
+
+
+
+  </div>
+  <app-search-post
+    (deletePostEvent)="openDeleteDialog($event)"
+    (editPostEvent)="openEditDialog($event)"
+    (viewPostEvent)="openViewDialog($event)">
+  </app-search-post>
+
+  <footer class="hk-footer">
+    <h3>About Mobile Post Offices</h3>
+    <p>
+      Mobile post offices provide essential postal services across different
+      <strong>rural</strong> areas in Hong Kong. They operate on scheduled days and
+      locations to serve communities.
+    </p>
+  </footer>
+
+</div>

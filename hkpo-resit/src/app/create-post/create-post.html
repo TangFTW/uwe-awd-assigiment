@@ -1,0 +1,66 @@
+<div class="ui raised segment">
+  <h2 class="ui header">Create New Post Office Record</h2>
+  <form [formGroup]="createPostForm"
+        (ngSubmit)="createRecord(createPostForm.value)"
+        class="ui form">
+    <div class="field">
+      <label>Mobile Code</label>
+      <input type="text" formControlName="mobileCode" placeholder="e.g. 1,A01">
+    </div>
+
+    <div class="field">
+      <label>Day of Week Code</label>
+      <input type="text" formControlName="dayOfWeekCode" placeholder="e.g. 1">
+    </div>
+
+    <div class="field">
+      <label>seq</label>
+      <input type="text" formControlName="seq" placeholder="e.g. 1">
+    </div>
+
+    <div class="field">
+      <label>District (EN)</label>
+      <input type="text" formControlName="districtEN" placeholder="e.g. Sha Tin">
+    </div>
+
+    <div class="field">
+      <label>Name (EN)</label>
+      <input type="text" formControlName="nameEN" placeholder="e.g. Lai King Post Office">
+    </div>
+
+    <div class="field">
+      <label>Address (EN)</label>
+      <input type="text" formControlName="addressEN" placeholder="e.g. 123 Lai King Hill Road, Lai King, Kowloon">
+    </div>
+
+    <div class="field">
+      <label>Address (Trad Chinese)</label>
+      <input type="text" formControlName="nameTC" placeholder="e.g. 123 荔景山路,荔景, 九龍">
+    </div>
+
+    <div class="field">
+      <label>Open Hour</label>
+      <input type="time" formControlName="openHour" placeholder="e.g. 0800">
+    </div>
+
+    <div class="field">
+      <label>Close Hour</label>
+      <input type="time" formControlName="closeHour" placeholder="e.g. 2000">
+    </div>
+
+    @if (createPostForm.valid) {
+      <button type="submit" class="ui button">Submit</button>
+    }
+
+    @if (message) {
+      <div class="ui message">{{ message }}</div>
+    }
+
+
+
+  </form>
+  <div class="ui horizontal divider">
+    <button mat-raised-button id="modal-close-button" (click)="closeModal()">Cancel</button>
+  </div>
+
+</div>>

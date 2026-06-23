@@ -1,0 +1,21 @@
+.hk-navbar {
+  background-color: #00833E;
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.hk-footer {
+  background-color: #f5f5f5;
+  padding: 2rem;
+  margin-top: 4rem;
+  border-top: 1px solid #ddd;
+  text-align: center;
+  color: #555;
+}
+
+.hk-footer h3 {
+  color: #00833E;
+}

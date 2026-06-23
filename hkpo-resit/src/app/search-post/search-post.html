@@ -1,0 +1,121 @@
+<div class="ui raised segment">
+  <h2 class="ui header">Search Moblie Post Offices</h2>
+  <form [formGroup]="searchPostForm" (ngSubmit)="onSubmit(searchPostForm.value)" class="ui form">
+    <div class="field">
+      <label>ID</label>
+      <input type="text" formControlName="id" placeholder="Search by ID">
+    </div>
+    <div class="field">
+      <label>District (EN)</label>
+      <input type="text" formControlName="districtEN" placeholder="e.g. Central">
+    </div>
+
+    <div class="field">
+      <label>Address (EN)</label>
+      <input type="text" formControlName="addressEN" placeholder="e.g. 1">
+    </div>
+
+    <div class="field">
+      <label>seq</label>
+      <input type="text" formControlName="seq" placeholder="e.g. 1">
+    </div>
+    <div class="field">
+      <label>Day of Week Code</label>
+      <input type="text" formControlName="dayOfWeekCode" placeholder="e.g. 1">
+    </div>
+
+    <div class="field">
+      <label>Name (EN)</label>
+      <input type="text" formControlName="nameEN" placeholder="e.g. Central Post Office">
+    </div>
+
+    <div class="field">
+      <label>Open Hour</label>
+      <input type="text" formControlName="openHour" placeholder="e.g. 08:00">
+    </div>
+
+    <div class="field">
+      <label>Close Hour</label>
+      <input type="text" formControlName="closeHour" placeholder="e.g. 20:00">
+    </div>
+
+    <button type="submit" class="ui button">Submit</button>
+    <button type="button" class="ui button" (click)="getAllPosts()">Show All Records</button>
+   </form>
+
+  @if (message && message !== 'Search record here.') {
+    <div class="ui error message">{{ message }}</div>
+  }
+
+
+  <!--maps-->
+  @if (mapAddress) {
+    <div class="ui segment">
+      <h4 class="ui header">Map: {{ mapAddress }}</h4>
+      <iframe
+        width="100%"
+        height="350"
+        style="border:0"
+        loading="lazy"
+        [src]="mapUrl">
+      </iframe>
+    </div>
+  }
+
+  <p></p>
+  <div class="table-scroll">
+    <table class="ui celled striped selectable table">
+      <thead>
+      <tr>
+        <th>id</th>
+        <th>Mobile Code</th>
+        <th>Day of week code</th>
+        <th>seq</th>
+        <th>Name (EN)</th>
+        <th>District (EN)</th>
+        <th>Location (EN)</th>
+        <th>Address (EN)</th>
+        <th colspan="4" class="center aligned">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <!-- @ for is a for loop, -->
+        @for (post of serverDataArr; track post.id) {
+          <tr>
+            <td>{{post.id}}</td>
+            <td>{{post.mobileCode}}</td>
+            <td>{{post.dayOfWeekCode}}</td>
+            <td>{{post.seq}}</td>
+            <td>{{post.nameEN}}</td>
+            <td>{{post.districtEN}}</td>
+            <td>{{post.locationEN}}</td>
+            <td>{{post.addressEN}}</td>
+
+            <td class="center aligned">
+              <button class="ui mini teal labeled icon button" (click)="viewButtonHandler(post)">
+                View
+              </button>
+            </td>
+            <td class="center aligned">
+              <button class="ui mini blue labeled icon button" (click)="editButtonHandler(post)">
+                Edit
+              </button>
+            </td>
+            <td class="center aligned">
+              <button class="ui mini red labeled icon button" (click)="deleteButtonHandler(post)">
+                Delete
+              </button>
+            </td>
+            <td class="center aligned">
+              <button class="ui mini green labeled icon button" (click)="showMap(post.latitude, post.longitude, post.addressEN)">
+                Map
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+
+</div>

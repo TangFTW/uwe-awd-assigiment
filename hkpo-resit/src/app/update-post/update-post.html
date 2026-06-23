@@ -1,0 +1,119 @@
+<div class="ui raised segment">
+  <h2 class="ui header">Update Post Office Record</h2>
+  <form [formGroup]="updatePostForm"
+        (ngSubmit)="updateRecord(updatePostForm.value)"
+        class="ui form">
+    <div class="field">
+      <label>Record ID(Input required)</label>
+      <input type="text" formControlName="id" placeholder="e.g. 1">
+    </div>
+    <!-- Display error message if the 'id' field is invalid/empty and has been touched -->
+    <div *ngIf="updatePostForm.controls['id'].invalid && updatePostForm.controls['id'].touched" class="ui error message">Please enter a Record ID</div>
+    <div class="field">
+      <label>Mobile Code</label>
+      <input type="text" formControlName="mobileCode" placeholder="e.g. 1,A01">
+    </div>
+
+    <div class="field">
+      <label>Day of Week Code</label>
+      <input type="text" formControlName="dayOfWeekCode" placeholder="e.g. 1">
+    </div>
+
+    <div class="field">
+      <label>seq</label>
+      <input type="text" formControlName="seq" placeholder="e.g. 1">
+    </div>
+
+    <div class="field">
+      <label>District (EN)</label>
+      <input type="text" formControlName="districtEN" placeholder="e.g. Sha Tin">
+    </div>
+
+    <div class="field">
+      <label>Name (EN)</label>
+      <input type="text" formControlName="nameEN" placeholder="e.g. Lai King Post Office">
+    </div>
+
+    <div class="field">
+      <label>Location (EN)</label>
+      <input type="text" formControlName="locationEN" placeholder="e.g. Lai King">
+    </div>
+
+    <div class="field">
+      <label>Address (EN)</label>
+      <input type="text" formControlName="addressEN" placeholder="e.g. 123 Lai King Hill Road, Lai King, Kowloon">
+    </div>
+
+    <div class="field">
+      <label>Name (Trad Chinese)</label>
+      <input type="text" formControlName="nameTC" placeholder="e.g. 名稱">
+    </div>
+
+    <div class="field">
+      <label>District (Trad Chinese)</label>
+      <input type="text" formControlName="districtTC" placeholder="e.g. 地區">
+    </div>
+
+    <div class="field">
+      <label>Location (Trad Chinese)</label>
+      <input type="text" formControlName="locationTC" placeholder="e.g. 位置">
+    </div>
+
+    <div class="field">
+      <label>Address (Trad Chinese)</label>
+      <input type="text" formControlName="addressTC" placeholder="e.g. 地址">
+    </div>
+    <!-- Simplified Chinese -->
+    <div class="field">
+      <label>Name (Simp Chinese)</label>
+      <input type="text" formControlName="nameSC" placeholder="e.g. 名称">
+    </div>
+
+    <div class="field">
+      <label>District (Simp Chinese)</label>
+      <input type="text" formControlName="districtSC" placeholder="e.g. 地区">
+    </div>
+
+    <div class="field">
+      <label>Location (Simp Chinese)</label>
+      <input type="text" formControlName="locationSC" placeholder="e.g. 位置">
+    </div>
+
+    <div class="field">
+      <label>Address (Simp Chinese)</label>
+      <input type="text" formControlName="addressSC" placeholder="e.g. 地址">
+    </div>
+
+    <div class="field">
+      <label>Open Hour</label>
+      <input type="time" formControlName="openHour" placeholder="e.g. 0800">
+    </div>
+
+    <div class="field">
+      <label>Close Hour</label>
+      <input type="time" formControlName="closeHour" placeholder="e.g. 2000">
+    </div>
+
+    <div class="field">
+      <label>Latitude</label>
+      <input type="number" step="any" formControlName="latitude" placeholder="e.g. 22.3080">
+    </div>
+
+    <div class="field">
+      <label>Longitude</label>
+      <input type="number" step="any" formControlName="longitude" placeholder="e.g. 114.1719">
+    </div>
+
+    <button type="submit" class="ui button">Submit</button>
+    <div class="ui left pointing red basic label">
+      {{ message }}
+    </div>
+
+
+
+  </form>
+  <div class="ui horizontal divider">
+    <button mat-raised-button id="modal-close-button" (click)="closeModal()">Cancel</button>
+  </div>
+
+</div>
